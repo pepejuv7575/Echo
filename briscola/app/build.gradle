@@ -1,0 +1,22 @@
+plugins { id 'com.android.application' }
+
+// Construit depuis la racine du dépôt Echo : sortie dans app/build (attendu par le workflow)
+if (projectDir.parentFile != rootProject.projectDir) {
+    layout.buildDirectory.set(rootProject.layout.projectDirectory.dir('app/build'))
+}
+
+android {
+    namespace 'com.briscola.siciliana'
+    compileSdk 34
+    defaultConfig {
+        applicationId "com.briscola.siciliana"
+        minSdk 24
+        targetSdk 34
+        versionCode 1
+        versionName "1.0"
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+}

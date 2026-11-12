@@ -12,5 +12,7 @@ dependencyResolutionManagement {
         mavenCentral()
     }
 }
-rootProject.name = "JuveFan"
+rootProject.name = "BriscolaSiciliana"
 include ':app'
+// Sur cette branche, le module :app est le jeu Briscola (dossier briscola/app)
+project(':app').projectDir = file('briscola/app')

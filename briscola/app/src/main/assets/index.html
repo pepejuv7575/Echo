@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>Briscola Siciliana</title>
+<style>
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body { margin: 0; height: 100%; }
+  body {
+    font-family: Georgia, 'Times New Roman', serif;
+    background: radial-gradient(ellipse at center, #1f7a4a 0%, #0f4d2c 70%, #0a3820 100%);
+    color: #fdf6e3; overflow: hidden; user-select: none;
+  }
+  .screen { display: none; height: 100%; flex-direction: column; align-items: center; justify-content: center; padding: 20px; text-align: center; }
+  .screen.on { display: flex; }
+  h1 { font-size: 34px; margin: 0 0 4px; color: #ffd166; text-shadow: 0 3px 0 #7a4b00; letter-spacing: 1px; }
+  .sub { opacity: .85; margin-bottom: 26px; font-style: italic; }
+  .trinacria { font-size: 56px; margin-bottom: 8px; }
+  button {
+    font-family: inherit; font-size: 18px; border: 0; border-radius: 14px;
+    padding: 14px 20px; margin: 7px 0; width: 100%; max-width: 320px;
+    background: #ffd166; color: #3b2300; font-weight: bold; box-shadow: 0 4px 0 #a9761b;
+  }
+  button:active { transform: translateY(3px); box-shadow: 0 1px 0 #a9761b; }
+  button.sec { background: #f4ecd8; box-shadow: 0 4px 0 #9d9480; }
+  button.ghost { background: transparent; color: #fdf6e3; box-shadow: none; border: 2px solid #fdf6e3aa; font-size: 15px; padding: 10px; }
+  input {
+    font-family: inherit; font-size: 20px; padding: 12px; border-radius: 12px; border: 0;
+    width: 100%; max-width: 320px; text-align: center; margin: 7px 0; background: #fdf6e3; color: #3b2300;
+  }
+  #codeInput { text-transform: uppercase; letter-spacing: 6px; font-weight: bold; }
+  .code { font-size: 46px; letter-spacing: 10px; font-weight: bold; color: #ffd166; background: #0006; padding: 10px 22px; border-radius: 14px; margin: 14px 0; }
+  .status { min-height: 24px; margin: 10px 0; opacity: .9; }
+  .err { color: #ffb4a2; }
+
+  /* ---- Table de jeu ---- */
+  #game { justify-content: space-between; padding: 10px 8px 14px; }
+  .bar { width: 100%; display: flex; justify-content: space-between; align-items: center; font-size: 15px; }
+  .pill { background: #0005; padding: 6px 12px; border-radius: 20px; }
+  .pill b { color: #ffd166; }
+  .row { display: flex; justify-content: center; gap: 8px; min-height: 120px; align-items: center; }
+  .middle { display: flex; align-items: center; justify-content: center; gap: 22px; width: 100%; }
+  .deckzone { position: relative; width: 100px; height: 130px; }
+  .deckzone .card { position: absolute; }
+  .deckzone .bris { transform: rotate(90deg); left: 22px; top: 10px; }
+  .deckzone .back { position: absolute; left: 0; top: 4px; }
+  .deckcount { position: absolute; left: 6px; top: 50px; z-index: 5; background: #000a; padding: 2px 8px; border-radius: 10px; font-size: 14px; }
+  .tablezone { display: flex; gap: 8px; width: 160px; height: 130px; align-items: center; justify-content: center; }
+  .msg { min-height: 26px; font-size: 17px; color: #ffd166; }
+
+  .card {
+    width: 74px; height: 112px; border-radius: 9px; background: #fffaf0;
+    border: 2px solid #d9c9a3; box-shadow: 0 3px 6px #0007; position: relative;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    color: var(--c); transition: transform .15s;
+  }
+  .card .tl { position: absolute; top: 4px; left: 7px; font-size: 20px; font-weight: bold; }
+  .card .br { position: absolute; bottom: 4px; right: 7px; font-size: 20px; font-weight: bold; transform: rotate(180deg); }
+  .card .s { font-size: 34px; line-height: 1; }
+  .card .nm { font-size: 11px; margin-top: 6px; font-style: italic; }
+  .card.trump { border-color: #ffd166; box-shadow: 0 0 0 2px #ffd166, 0 3px 6px #0007; }
+  .card.play { cursor: pointer; }
+  .card.play:active { transform: translateY(-14px); }
+  .hand.active .card { transform: translateY(-6px); }
+  .hand:not(.active) .card { filter: brightness(.82); }
+  .back {
+    width: 60px; height: 92px; border-radius: 8px; border: 2px solid #fdf6e3;
+    background: repeating-linear-gradient(45deg, #8b1e1e 0 6px, #a83232 6px 12px);
+    box-shadow: 0 3px 6px #0007;
+  }
+  .row.opp .back { margin: 0 -6px; }
+  .trumpinfo { font-size: 14px; opacity: .9; }
+  .overlay { position: fixed; inset: 0; background: #000b; display: none; align-items: center; justify-content: center; flex-direction: column; padding: 24px; z-index: 20; text-align: center; }
+  .overlay.on { display: flex; }
+  .big { font-size: 30px; color: #ffd166; margin-bottom: 8px; }
+  .rules { text-align: left; max-width: 360px; font-size: 15px; line-height: 1.45; overflow-y: auto; max-height: 70vh; }
+</style>
+</head>
+<body>
+
+<!-- Menu -->
+<div class="screen on" id="menu">
+  <div class="trinacria">🍋</div>
+  <h1>Briscola Siciliana</h1>
+  <div class="sub">Carte siciliane · 40 carte</div>
+  <input id="nameInput" maxlength="14" placeholder="Ton prénom">
+  <button onclick="startCpu()">🤖 Jouer contre l'ordinateur</button>
+  <button onclick="hostOnline()">🌐 Créer une partie en ligne</button>
+  <button class="sec" onclick="show('join')">🔑 Rejoindre un ami</button>
+  <button class="ghost" onclick="showRules()">📜 Règles du jeu</button>
+  <div class="status err" id="menuStatus"></div>
+</div>
+
+<!-- Attente hôte -->
+<div class="screen" id="lobby">
+  <h1>Partie en ligne</h1>
+  <div>Donne ce code à ton ami :</div>
+  <div class="code" id="myCode">·····</div>
+  <div class="status" id="lobbyStatus">Connexion au serveur…</div>
+  <button class="sec" onclick="shareCode()">📤 Partager le code</button>
+  <button class="ghost" onclick="leave()">Annuler</button>
+</div>
+
+<!-- Rejoindre -->
+<div class="screen" id="join">
+  <h1>Rejoindre</h1>
+  <div>Entre le code de ton ami :</div>
+  <input id="codeInput" maxlength="5" placeholder="ABCDE" autocomplete="off">
+  <button onclick="joinOnline()">Rejoindre</button>
+  <div class="status" id="joinStatus"></div>
+  <button class="ghost" onclick="leave()">Retour</button>
+</div>
+
+<!-- Jeu -->
+<div class="screen" id="game">
+  <div class="bar">
+    <span class="pill" id="oppLabel">Adversaire</span>
+    <span class="pill">Points : <b id="oppPts">0</b></span>
+  </div>
+  <div class="row opp" id="oppHand"></div>
+
+  <div class="middle">
+    <div class="deckzone" id="deckZone"></div>
+    <div class="tablezone" id="tableZone"></div>
+  </div>
+  <div class="trumpinfo" id="trumpInfo"></div>
+  <div class="msg" id="msg"></div>
+
+  <div class="row hand" id="myHand"></div>
+  <div class="bar">
+    <span class="pill" id="myLabel">Toi</span>
+    <span class="pill">Points : <b id="myPts">0</b></span>
+    <span class="pill" onclick="confirmQuit()">✖</span>
+  </div>
+</div>
+
+<!-- Fin de partie -->
+<div class="overlay" id="endOv">
+  <div class="big" id="endTitle"></div>
+  <div id="endScore" style="font-size:20px;margin-bottom:18px"></div>
+  <button onclick="rematch()">🔄 Rejouer</button>
+  <button class="ghost" onclick="leave()">Menu principal</button>
+  <div class="status" id="endStatus"></div>
+</div>
+
+<!-- Règles -->
+<div class="overlay" id="rulesOv">
+  <div class="big">Règles</div>
+  <div class="rules">
+    <p><b>Le jeu :</b> 40 cartes siciliennes en 4 couleurs : Denari 🪙, Coppe 🏆, Spade ⚔️, Bastoni 🪵. Chaque joueur reçoit 3 cartes. La carte retournée sous le talon désigne la <b>briscola</b> (l'atout).</p>
+    <p><b>Un pli :</b> le premier joueur pose une carte, l'autre répond avec n'importe quelle carte (pas d'obligation de suivre). Le pli est gagné par la plus forte carte de la couleur demandée, sauf si une briscola est jouée : la briscola la plus forte gagne.</p>
+    <p><b>Ordre de force :</b> As &gt; 3 &gt; Roi &gt; Cavalier &gt; Valet (Fante) &gt; 7 &gt; 6 &gt; 5 &gt; 4 &gt; 2.</p>
+    <p><b>Points :</b> As 11 · 3 = 10 · Roi 4 · Cavalier 3 · Valet 2 · autres 0. Total 120.</p>
+    <p>Après chaque pli, le gagnant pioche en premier puis joue le pli suivant. La briscola retournée est la dernière carte piochée.</p>
+    <p><b>Victoire :</b> plus de 60 points. 60–60 = égalité.</p>
+  </div>
+  <button onclick="hideOv('rulesOv')">Compris !</button>
+</div>
+
+<script src="engine.js"></script>
+<script src="peerjs.min.js"></script>
+<script>
+var B = Briscola;
+var mode = null;        // 'cpu' | 'host' | 'guest'
+var game = null;        // état complet (cpu / hôte uniquement)
+var names = ['Toi', 'Adversaire'];
+var peer = null, conn = null;
+var nextLeader = 0;
+var lastView = null;
+var resolveTimer = null, cpuTimer = null;
+var PREFIX = 'briscola-siciliana-v1-';
+
+function $(id) { return document.getElementById(id); }
+function show(id) {
+  document.querySelectorAll('.screen').forEach(function (s) { s.classList.remove('on'); });
+  $(id).classList.add('on');
+}
+function hideOv(id) { $(id).classList.remove('on'); }
+function showRules() { $('rulesOv').classList.add('on'); }
+function myName() {
+  var n = ($('nameInput').value || '').trim() || 'Joueur';
+  try { localStorage.setItem('bris_name', n); } catch (e) {}
+  return n;
+}
+try { $('nameInput').value = localStorage.getItem('bris_name') || ''; } catch (e) {}
+
+/* ---------- Chargement PeerJS (local, sinon CDN) ---------- */
+function ensurePeer(cb) {
+  if (window.Peer) return cb();
+  var s = document.createElement('script');
+  s.src = 'https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js';
+  s.onload = function () { cb(); };
+  s.onerror = function () { cb(new Error('PeerJS indisponible')); };
+  document.head.appendChild(s);
+}
+
+/* ---------- Rendu d'une carte ---------- */
+function cardHTML(c, opts) {
+  opts = opts || {};
+  var su = B.SUITS[B.suit(c)];
+  var cls = 'card' + (opts.trump ? ' trump' : '') + (opts.play ? ' play' : '') + (opts.extra ? ' ' + opts.extra : '');
+  var attr = opts.idx !== undefined ? ' data-i="' + opts.idx + '"' : '';
+  return '<div class="' + cls + '" style="--c:' + su.c + '"' + attr + '>' +
+    '<span class="tl">' + B.label(c) + '</span><span class="s">' + su.s + '</span>' +
+    '<span class="nm">' + B.rankName(c) + ' di ' + su.n + '</span>' +
+    '<span class="br">' + B.label(c) + '</span></div>';
+}
+
+function render(v) {
+  lastView = v;
+  show('game');
+  $('myLabel').textContent = v.myName || 'Toi';
+  $('oppLabel').textContent = (v.oppName || 'Adversaire') + ' · ' + v.oppCount + ' 🂠';
+  $('myPts').textContent = v.myPts;
+  $('oppPts').textContent = v.oppPts;
+
+  var oh = '';
+  for (var i = 0; i < v.oppCount; i++) oh += '<div class="back"></div>';
+  $('oppHand').innerHTML = oh;
+
+  var dz = '';
+  if (v.briscolaInDeck) {
+    dz += cardHTML(v.briscola, { trump: true, extra: 'bris' });
+    if (v.deckCount > 1) dz += '<div class="back"></div>';
+    dz += '<div class="deckcount">' + v.deckCount + '</div>';
+  }
+  $('deckZone').innerHTML = dz;
+  var ts = B.SUITS[v.trump];
+  $('trumpInfo').innerHTML = 'Briscola : ' + ts.s + ' <b>' + ts.n + '</b>';
+
+  $('tableZone').innerHTML = v.table.map(function (t) {
+    return cardHTML(t.card, { trump: B.suit(t.card) === v.trump });
+  }).join('');
+
+  var mh = $('myHand');
+  mh.className = 'row hand' + (v.myTurn ? ' active' : '');
+  mh.innerHTML = v.hand.map(function (c, i) {
+    return cardHTML(c, { trump: B.suit(c) === v.trump, play: v.myTurn, idx: i });
+  }).join('');
+
+  var m = '';
+  if (v.phase === 'resolve') {
+    m = '…';
+  } else if (v.phase === 'play') {
+    m = v.myTurn ? 'À toi de jouer !' : 'Au tour de ' + (v.oppName || "l'adversaire") + '…';
+    if (v.lastWinnerMe !== null && v.table.length === 0) m = (v.lastWinnerMe ? 'Tu as pris le pli. ' : 'Pli perdu. ') + m;
+  }
+  $('msg').textContent = m;
+
+  if (v.phase === 'over') showEnd(v);
+  else hideOv('endOv');
+}
+
+$('myHand').addEventListener('click', function (e) {
+  var el = e.target.closest('.card');
+  if (!el || !lastView || !lastView.myTurn) return;
+  var i = parseInt(el.getAttribute('data-i'), 10);
+  if (mode === 'guest') {
+    lastView.myTurn = false;
+    conn.send({ t: 'play', i: i });
+  } else {
+    doPlay(0, i);
+  }
+});
+
+function showEnd(v) {
+  var t = v.myPts > 60 ? '🏆 Victoire !' : v.myPts === 60 ? '🤝 Égalité' : '😞 Défaite';
+  $('endTitle').textContent = t;
+  $('endScore').textContent = (v.myName || 'Toi') + ' ' + v.myPts + ' – ' + v.oppPts + ' ' + (v.oppName || 'Adversaire');
+  $('endStatus').textContent = '';
+  $('endOv').classList.add('on');
+}
+
+/* ---------- Logique hôte / solo ---------- */
+function broadcast() {
+  render(B.view(game, 0, names));
+  if (mode === 'host' && conn && conn.open) conn.send({ t: 'state', v: B.view(game, 1, names) });
+  if (mode === 'cpu' && game.phase === 'play' && game.turn === 1) {
+    clearTimeout(cpuTimer);
+    cpuTimer = setTimeout(function () { doPlay(1, B.cpuChoose(game, 1)); }, 750);
+  }
+}
+
+function doPlay(p, i) {
+  if (!game || !B.play(game, p, i)) return;
+  broadcast();
+  if (game.phase === 'resolve') {
+    clearTimeout(resolveTimer);
+    resolveTimer = setTimeout(function () { if (!game) return; B.resolve(game); broadcast(); }, 1300);
+  }
+}
+
+function newRound() {
+  game = B.newGame(nextLeader);
+  nextLeader = 1 - nextLeader;
+  broadcast();
+}
+
+function startCpu() {
+  mode = 'cpu';
+  names = [myName(), 'Nonno Turi 🤖'];
+  nextLeader = 0;
+  newRound();
+}
+
+function rematch() {
+  if (mode === 'guest') {
+    conn.send({ t: 'again' });
+    $('endStatus').textContent = 'Demande envoyée…';
+  } else {
+    newRound();
+  }
+}
+
+/* ---------- En ligne (PeerJS / WebRTC) ---------- */
+function randCode() {
+  var a = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789', s = '';
+  for (var i = 0; i < 5; i++) s += a[Math.floor(Math.random() * a.length)];
+  return s;
+}
+
+function hostOnline() {
+  mode = 'host';
+  names = [myName(), 'Ami'];
+  show('lobby');
+  $('lobbyStatus').className = 'status';
+  $('lobbyStatus').textContent = 'Connexion au serveur…';
+  ensurePeer(function (err) {
+    if (err) return lobbyError('Pas de connexion Internet ?');
+    var code = randCode();
+    peer = new Peer(PREFIX + code);
+    peer.on('open', function () {
+      $('myCode').textContent = code;
+      $('lobbyStatus').textContent = "En attente de ton ami…";
+    });
+    peer.on('error', function (e) {
+      if (e.type === 'unavailable-id') { peer.destroy(); return hostOnline(); }
+      lobbyError('Erreur : ' + e.type);
+    });
+    peer.on('connection', function (c) {
+      if (conn && conn.open) { c.on('open', function () { c.send({ t: 'full' }); setTimeout(function(){ c.close(); }, 500); }); return; }
+      conn = c;
+      conn.on('open', function () { $('lobbyStatus').textContent = 'Ami connecté !'; });
+      conn.on('data', function (d) {
+        if (d.t === 'hello') { names[1] = d.name || 'Ami'; nextLeader = 0; newRound(); }
+        else if (d.t === 'play') doPlay(1, d.i);
+        else if (d.t === 'again') { if (!game || game.phase === 'over') newRound(); }
+      });
+      conn.on('close', opponentLeft);
+    });
+  });
+}
+function lobbyError(t) { $('lobbyStatus').className = 'status err'; $('lobbyStatus').textContent = t; }
+
+function joinOnline() {
+  var code = ($('codeInput').value || '').trim().toUpperCase();
+  if (code.length !== 5) { $('joinStatus').textContent = 'Le code fait 5 caractères.'; return; }
+  mode = 'guest';
+  $('joinStatus').className = 'status';
+  $('joinStatus').textContent = 'Connexion…';
+  ensurePeer(function (err) {
+    if (err) { $('joinStatus').textContent = 'Pas de connexion Internet ?'; return; }
+    peer = new Peer();
+    peer.on('error', function (e) {
+      $('joinStatus').className = 'status err';
+      $('joinStatus').textContent = e.type === 'peer-unavailable' ? 'Partie introuvable. Vérifie le code.' : 'Erreur : ' + e.type;
+    });
+    peer.on('open', function () {
+      conn = peer.connect(PREFIX + code, { reliable: true });
+      conn.on('open', function () {
+        $('joinStatus').textContent = 'Connecté !';
+        conn.send({ t: 'hello', name: myName() });
+      });
+      conn.on('data', function (d) {
+        if (d.t === 'state') render(d.v);
+        else if (d.t === 'full') { $('joinStatus').textContent = 'Cette partie est déjà complète.'; }
+      });
+      conn.on('close', opponentLeft);
+    });
+  });
+}
+
+function opponentLeft() {
+  if (mode !== 'host' && mode !== 'guest') return;
+  leave();
+  $('menuStatus').textContent = "📴 Ton ami s'est déconnecté.";
+}
+
+function leave() {
+  clearTimeout(resolveTimer); clearTimeout(cpuTimer);
+  mode = null; game = null; lastView = null;
+  try { if (conn) conn.close(); } catch (e) {}
+  try { if (peer) peer.destroy(); } catch (e) {}
+  conn = null; peer = null;
+  hideOv('endOv');
+  $('menuStatus').textContent = '';
+  show('menu');
+}
+
+var quitArmed = false;
+function confirmQuit() {
+  if (quitArmed) { quitArmed = false; return leave(); }
+  quitArmed = true;
+  $('msg').textContent = 'Touche encore ✖ pour quitter';
+  setTimeout(function () { quitArmed = false; }, 2500);
+}
+
+function shareCode() {
+  var code = $('myCode').textContent;
+  var text = 'Viens jouer à la Briscola Siciliana avec moi ! Code : ' + code;
+  if (window.AndroidBridge && AndroidBridge.share) AndroidBridge.share(text);
+  else if (navigator.share) navigator.share({ text: text }).catch(function () {});
+}
+
+// bouton retour Android
+window.onAndroidBack = function () {
+  if ($('rulesOv').classList.contains('on')) { hideOv('rulesOv'); return true; }
+  if (!$('menu').classList.contains('on')) { if ($('game').classList.contains('on')) confirmQuit(); else leave(); return true; }
+  return false;
+};
+</script>
+</body>
+</html>
