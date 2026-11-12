@@ -2,7 +2,7 @@ name: Construire l'APK
 
 on:
   push:
-    branches: [ main, master ]
+    branches: [ main, master, juve-fan ]
   workflow_dispatch:
 
 permissions:
