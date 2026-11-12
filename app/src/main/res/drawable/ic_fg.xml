@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp" android:height="108dp"
+    android:viewportWidth="108" android:viewportHeight="108">
+    <!-- Bouclier rayé noir et blanc (design original) -->
+    <path android:fillColor="#FFFFFF"
+        android:pathData="M34,30 L74,30 L74,58 C74,70 64,78 54,82 C44,78 34,70 34,58 Z" />
+    <path android:fillColor="#000000"
+        android:pathData="M42,30 L50,30 L50,80 C47,79 44,77 42,75 Z" />
+    <path android:fillColor="#000000"
+        android:pathData="M58,30 L66,30 L66,75 C64,77 61,79 58,80 Z" />
+    <path android:fillColor="#D4AF37"
+        android:pathData="M54,20 L57,26 L63,26 L58,29.5 L60,35 L54,31.5 L48,35 L50,29.5 L45,26 L51,26 Z" />
+</vector>
