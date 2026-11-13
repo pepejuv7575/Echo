@@ -39,36 +39,30 @@
   .bar { width: 100%; display: flex; justify-content: space-between; align-items: center; font-size: 15px; }
   .pill { background: #0005; padding: 6px 12px; border-radius: 20px; }
   .pill b { color: #ffd166; }
-  .row { display: flex; justify-content: center; gap: 8px; min-height: 120px; align-items: center; }
+  .row { display: flex; justify-content: center; gap: 8px; min-height: 100px; align-items: center; }
+  .row.hand { min-height: 155px; }
   .middle { display: flex; align-items: center; justify-content: center; gap: 22px; width: 100%; }
-  .deckzone { position: relative; width: 100px; height: 130px; }
+  .deckzone { position: relative; width: 110px; height: 130px; }
   .deckzone .card { position: absolute; }
-  .deckzone .bris { transform: rotate(90deg); left: 22px; top: 10px; }
-  .deckzone .back { position: absolute; left: 0; top: 4px; }
-  .deckcount { position: absolute; left: 6px; top: 50px; z-index: 5; background: #000a; padding: 2px 8px; border-radius: 10px; font-size: 14px; }
-  .tablezone { display: flex; gap: 8px; width: 160px; height: 130px; align-items: center; justify-content: center; }
+  .deckzone .bris { transform: rotate(90deg); left: 34px; top: 9px; }
+  .deckzone .back { position: absolute; left: 0; top: 20px; }
+  .deckcount { position: absolute; left: 14px; top: 56px; z-index: 5; background: #000a; padding: 2px 8px; border-radius: 10px; font-size: 14px; }
+  .tablezone { display: flex; gap: 6px; width: 170px; height: 135px; align-items: center; justify-content: center; }
   .msg { min-height: 26px; font-size: 17px; color: #ffd166; }
 
   .card {
-    width: 74px; height: 112px; border-radius: 9px; background: #fffaf0;
-    border: 2px solid #d9c9a3; box-shadow: 0 3px 6px #0007; position: relative;
-    display: flex; flex-direction: column; align-items: center; justify-content: center;
-    color: var(--c); transition: transform .15s;
+    width: 88px; height: 141px; position: relative; transition: transform .15s;
+    filter: drop-shadow(0 3px 4px #0008); border-radius: 8px;
   }
-  .card .tl { position: absolute; top: 4px; left: 7px; font-size: 20px; font-weight: bold; }
-  .card .br { position: absolute; bottom: 4px; right: 7px; font-size: 20px; font-weight: bold; transform: rotate(180deg); }
-  .card .s { font-size: 34px; line-height: 1; }
-  .card .nm { font-size: 11px; margin-top: 6px; font-style: italic; }
-  .card.trump { border-color: #ffd166; box-shadow: 0 0 0 2px #ffd166, 0 3px 6px #0007; }
+  .card svg, .back svg { width: 100%; height: 100%; display: block; }
+  .card.trump::after { content: ''; position: absolute; inset: -3px; border-radius: 10px; box-shadow: 0 0 0 3px #ffd166; pointer-events: none; }
   .card.play { cursor: pointer; }
   .card.play:active { transform: translateY(-14px); }
   .hand.active .card { transform: translateY(-6px); }
-  .hand:not(.active) .card { filter: brightness(.82); }
-  .back {
-    width: 60px; height: 92px; border-radius: 8px; border: 2px solid #fdf6e3;
-    background: repeating-linear-gradient(45deg, #8b1e1e 0 6px, #a83232 6px 12px);
-    box-shadow: 0 3px 6px #0007;
-  }
+  .hand:not(.active) .card { filter: drop-shadow(0 3px 4px #0008) brightness(.8); }
+  .tablezone .card { width: 80px; height: 128px; }
+  .deckzone .card { width: 70px; height: 112px; }
+  .back { width: 56px; height: 90px; filter: drop-shadow(0 3px 4px #0008); }
   .row.opp .back { margin: 0 -6px; }
   .trumpinfo { font-size: 14px; opacity: .9; }
   .overlay { position: fixed; inset: 0; background: #000b; display: none; align-items: center; justify-content: center; flex-direction: column; padding: 24px; z-index: 20; text-align: center; }
@@ -159,6 +153,7 @@
 </div>
 
 <script src="engine.js"></script>
+<script src="cards.js"></script>
 <script src="peerjs.min.js"></script>
 <script>
 var B = Briscola;
@@ -198,14 +193,12 @@ function ensurePeer(cb) {
 /* ---------- Rendu d'une carte ---------- */
 function cardHTML(c, opts) {
   opts = opts || {};
-  var su = B.SUITS[B.suit(c)];
   var cls = 'card' + (opts.trump ? ' trump' : '') + (opts.play ? ' play' : '') + (opts.extra ? ' ' + opts.extra : '');
   var attr = opts.idx !== undefined ? ' data-i="' + opts.idx + '"' : '';
-  return '<div class="' + cls + '" style="--c:' + su.c + '"' + attr + '>' +
-    '<span class="tl">' + B.label(c) + '</span><span class="s">' + su.s + '</span>' +
-    '<span class="nm">' + B.rankName(c) + ' di ' + su.n + '</span>' +
-    '<span class="br">' + B.label(c) + '</span></div>';
+  var su = B.SUITS[B.suit(c)];
+  return '<div class="' + cls + '"' + attr + ' title="' + B.rankName(c) + ' di ' + su.n + '">' + CardArt.svg(c) + '</div>';
 }
+function backHTML() { return '<div class="back">' + CardArt.back() + '</div>'; }
 
 function render(v) {
   lastView = v;
@@ -216,13 +209,13 @@ function render(v) {
   $('oppPts').textContent = v.oppPts;
 
   var oh = '';
-  for (var i = 0; i < v.oppCount; i++) oh += '<div class="back"></div>';
+  for (var i = 0; i < v.oppCount; i++) oh += backHTML();
   $('oppHand').innerHTML = oh;
 
   var dz = '';
   if (v.briscolaInDeck) {
     dz += cardHTML(v.briscola, { trump: true, extra: 'bris' });
-    if (v.deckCount > 1) dz += '<div class="back"></div>';
+    if (v.deckCount > 1) dz += backHTML();
     dz += '<div class="deckcount">' + v.deckCount + '</div>';
   }
   $('deckZone').innerHTML = dz;
