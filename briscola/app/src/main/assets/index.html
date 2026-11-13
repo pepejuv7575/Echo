@@ -313,69 +313,135 @@ function randCode() {
   return s;
 }
 
+var RETRY_ERRORS = ['network', 'socket-error', 'socket-closed', 'server-error', 'disconnected'];
+
+// Reconnexion automatique au serveur (après une mise en arrière-plan, une coupure Wi-Fi…)
+function watchPeer(p, onLost, onBack) {
+  p.on('disconnected', function () {
+    if (p !== peer || p.destroyed) return;
+    onLost();
+    setTimeout(function () {
+      if (p === peer && !p.destroyed && p.disconnected) { try { p.reconnect(); } catch (e) {} }
+    }, 1200);
+  });
+  p.on('open', function () { if (p === peer) onBack(); });
+}
+document.addEventListener('visibilitychange', function () {
+  if (!document.hidden && peer && !peer.destroyed && peer.disconnected) { try { peer.reconnect(); } catch (e) {} }
+});
+
+var hostCode = null;
 function hostOnline() {
   mode = 'host';
   names = [myName(), 'Ami'];
+  hostCode = null;
   show('lobby');
-  $('lobbyStatus').className = 'status';
-  $('lobbyStatus').textContent = 'Connexion au serveur…';
+  $('myCode').textContent = '·····';
+  setLobby('Connexion au serveur…');
   ensurePeer(function (err) {
-    if (err) return lobbyError('Pas de connexion Internet ?');
-    var code = randCode();
-    peer = new Peer(PREFIX + code);
-    peer.on('open', function () {
-      $('myCode').textContent = code;
-      $('lobbyStatus').textContent = "En attente de ton ami…";
-    });
-    peer.on('error', function (e) {
-      if (e.type === 'unavailable-id') { peer.destroy(); return hostOnline(); }
-      lobbyError('Erreur : ' + e.type);
-    });
-    peer.on('connection', function (c) {
-      if (conn && conn.open) { c.on('open', function () { c.send({ t: 'full' }); setTimeout(function(){ c.close(); }, 500); }); return; }
-      conn = c;
-      conn.on('open', function () { $('lobbyStatus').textContent = 'Ami connecté !'; });
-      conn.on('data', function (d) {
-        if (d.t === 'hello') { names[1] = d.name || 'Ami'; nextLeader = 0; newRound(); }
-        else if (d.t === 'play') doPlay(1, d.i);
-        else if (d.t === 'again') { if (!game || game.phase === 'over') newRound(); }
-      });
-      conn.on('close', opponentLeft);
-    });
+    if (err) return setLobby('Pas de connexion Internet ?', true);
+    startHostPeer(randCode());
   });
 }
-function lobbyError(t) { $('lobbyStatus').className = 'status err'; $('lobbyStatus').textContent = t; }
+
+function setLobby(t, isErr) { $('lobbyStatus').className = 'status' + (isErr ? ' err' : ''); $('lobbyStatus').textContent = t; }
+function lobbyIdle() { return mode === 'host' && !(conn && conn.open); }
+
+function startHostPeer(code) {
+  if (mode !== 'host') return;
+  var p = new Peer(PREFIX + code);
+  peer = p;
+  watchPeer(p,
+    function () { if (lobbyIdle()) setLobby('Reconnexion au serveur…'); },
+    function () {
+      hostCode = code;
+      $('myCode').textContent = code;
+      if (lobbyIdle()) setLobby('En attente de ton ami…');
+    });
+  p.on('error', function (e) {
+    if (p !== peer) return;
+    if (e.type === 'unavailable-id') {
+      p.destroy();
+      // code déjà donné à l'ami : on garde le même, sinon on en tire un autre
+      if (hostCode) setTimeout(function () { startHostPeer(hostCode); }, 3000);
+      else startHostPeer(randCode());
+      return;
+    }
+    if (RETRY_ERRORS.indexOf(e.type) >= 0) {
+      if (lobbyIdle()) setLobby('Reconnexion au serveur…');
+      setTimeout(function () {
+        if (p !== peer) return;
+        if (p.destroyed) startHostPeer(hostCode || code);
+        else if (p.disconnected) { try { p.reconnect(); } catch (x) {} }
+      }, 2000);
+      return;
+    }
+    if (lobbyIdle()) setLobby('Erreur : ' + e.type, true);
+  });
+  p.on('connection', function (c) {
+    if (conn && conn.open) { c.on('open', function () { c.send({ t: 'full' }); setTimeout(function(){ c.close(); }, 500); }); return; }
+    conn = c;
+    conn.on('open', function () { setLobby('Ami connecté !'); });
+    conn.on('data', function (d) {
+      if (d.t === 'hello') { names[1] = d.name || 'Ami'; nextLeader = 0; newRound(); }
+      else if (d.t === 'play') doPlay(1, d.i);
+      else if (d.t === 'again') { if (!game || game.phase === 'over') newRound(); }
+    });
+    conn.on('close', opponentLeft);
+  });
+}
+
+function setJoin(t, isErr) { $('joinStatus').className = 'status' + (isErr ? ' err' : ''); $('joinStatus').textContent = t; }
 
 function joinOnline() {
   var code = ($('codeInput').value || '').trim().toUpperCase();
-  if (code.length !== 5) { $('joinStatus').textContent = 'Le code fait 5 caractères.'; return; }
+  if (code.length !== 5) { setJoin('Le code fait 5 caractères.', true); return; }
+  try { if (peer) peer.destroy(); } catch (e) {}
+  peer = null; conn = null;
   mode = 'guest';
-  $('joinStatus').className = 'status';
-  $('joinStatus').textContent = 'Connexion…';
+  setJoin('Connexion…');
   ensurePeer(function (err) {
-    if (err) { $('joinStatus').textContent = 'Pas de connexion Internet ?'; return; }
-    peer = new Peer();
-    peer.on('error', function (e) {
-      $('joinStatus').className = 'status err';
-      $('joinStatus').textContent = e.type === 'peer-unavailable' ? 'Partie introuvable. Vérifie le code.' : 'Erreur : ' + e.type;
-    });
-    peer.on('open', function () {
-      conn = peer.connect(PREFIX + code, { reliable: true });
-      conn.on('open', function () {
-        $('joinStatus').textContent = 'Connecté !';
-        conn.send({ t: 'hello', name: myName() });
+    if (err) { setJoin('Pas de connexion Internet ?', true); return; }
+    var p = new Peer();
+    peer = p;
+    var tries = 0;
+    function connectToHost() {
+      if (p !== peer || mode !== 'guest') return;
+      var c = p.connect(PREFIX + code, { reliable: true });
+      conn = c;
+      c.on('open', function () {
+        setJoin('Connecté !');
+        c.send({ t: 'hello', name: myName() });
       });
-      conn.on('data', function (d) {
+      c.on('data', function (d) {
         if (d.t === 'state') render(d.v);
-        else if (d.t === 'full') { $('joinStatus').textContent = 'Cette partie est déjà complète.'; }
+        else if (d.t === 'full') { setJoin('Cette partie est déjà complète.', true); }
       });
-      conn.on('close', opponentLeft);
+      c.on('close', opponentLeft);
+    }
+    watchPeer(p, function () { if (!(conn && conn.open)) setJoin('Reconnexion…'); }, function () {});
+    p.once('open', connectToHost);
+    p.on('error', function (e) {
+      if (p !== peer || (conn && conn.open)) return;
+      if (e.type === 'peer-unavailable') {
+        // l'hôte est peut-être en train de se reconnecter : on réessaie quelques fois
+        if (++tries <= 4) { setJoin('Recherche de la partie… (' + tries + '/4)'); setTimeout(connectToHost, 2500); }
+        else setJoin("Partie introuvable. Vérifie le code et que ton ami a l'appli ouverte.", true);
+        return;
+      }
+      if (RETRY_ERRORS.indexOf(e.type) >= 0) { setJoin('Reconnexion…'); return; }
+      setJoin('Erreur : ' + e.type, true);
     });
   });
 }
 
 function opponentLeft() {
   if (mode !== 'host' && mode !== 'guest') return;
+  if (!game && !lastView) {
+    // pas encore en partie : l'hôte attend simplement un autre essai
+    if (mode === 'host') { conn = null; setLobby('En attente de ton ami…'); }
+    return;
+  }
   leave();
   $('menuStatus').textContent = "📴 Ton ami s'est déconnecté.";
 }
@@ -402,6 +468,7 @@ function confirmQuit() {
 function shareCode() {
   var code = $('myCode').textContent;
   var text = 'Viens jouer à la Briscola Siciliana avec moi ! Code : ' + code;
+  setLobby('Reviens ici après avoir envoyé le code 😉');
   if (window.AndroidBridge && AndroidBridge.share) AndroidBridge.share(text);
   else if (navigator.share) navigator.share({ text: text }).catch(function () {});
 }
