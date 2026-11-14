@@ -2,21 +2,44 @@ plugins {
     id 'com.android.application'
 }
 
+def runNumber = (System.getenv('GITHUB_RUN_NUMBER') ?: '1')
+
+// Clé de signature fixe (permet les mises à jour sans désinstaller)
+def ksFile = file("$buildDir/rcsc-key.jks")
+def ksB64 = rootProject.file('keystore.b64')
+if (ksB64.exists()) {
+    ksFile.parentFile.mkdirs()
+    ksFile.bytes = ksB64.text.replaceAll('\\s', '').decodeBase64()
+}
+
 android {
-    namespace 'com.juvefan.app'
+    namespace 'be.zebres.rcsc'
     compileSdk 34
 
     defaultConfig {
-        applicationId 'com.juvefan.app'
-        minSdk 26
+        applicationId 'be.zebres.rcsc'
+        minSdk 24
         targetSdk 34
-        versionCode 1
-        versionName '1.0'
+        versionCode runNumber.toInteger()
+        versionName "1.0." + runNumber
+    }
+
+    signingConfigs {
+        zebres {
+            storeFile ksFile
+            storePassword 'zebres1904'
+            keyAlias 'rcsc'
+            keyPassword 'zebres1904'
+        }
     }
 
     buildTypes {
+        debug {
+            signingConfig signingConfigs.zebres
+        }
         release {
             minifyEnabled false
+            signingConfig signingConfigs.zebres
         }
     }
 
