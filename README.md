@@ -1,18 +1,20 @@
-# Juve Fan — appli Android
+# 🦓 RCSC Zèbres — app Android du Sporting Charleroi
 
-Appli Android native pour suivre la Juventus de Turin :
+Application de fan (non officielle) du **Royal Charleroi Sporting Club**.
 
-- **Matchs** : prochains matchs, derniers résultats, classement Serie A
-- **Actus** : toute l'actualité du club (Google Actualités, en français)
-- **Mercato** : transferts et rumeurs
-- **Joueurs** : le quotidien des joueurs + l'effectif
-- **Vidéos** : liens vers les buts et résumés de chaque match, chaînes YouTube officielles
+## Contenu (données en direct)
+- **Accueil** : prochain match avec compte à rebours, dernier résultat, position, forme, dernières infos
+- **Classement** complet de la Pro League (+ play-offs quand ils démarrent)
+- **Matchs** : à venir, résultats, stats de saison (domicile/extérieur, buts, clean sheets…)
+- **Fiche match** : buteurs, cartons, remplacements, statistiques, forme, compositions
+- **Effectif** : tous les joueurs par poste, meilleurs buteurs/passeurs, fiche joueur complète
+- **Actus** : communiqués officiels + presse belge
+- **Mercato** : transferts, prêts, rumeurs
+- **Vidéos** : chaîne YouTube officielle Sporting Charleroi TV
+- **Club** : histoire, palmarès, stade, liens officiels
 
-Données : TheSportsDB (gratuit) et Google Actualités. Bouton ⟳ pour actualiser.
+Sources : ESPN, Google Actualités, YouTube. Fonctionne hors ligne avec les dernières données chargées.
 
-## Obtenir l'APK
-
-Chaque envoi sur la branche `main` lance la compilation sur GitHub (onglet **Actions**).
-Quand c'est fini (≈ 5 min), l'APK est dans l'onglet **Releases** → `JuveFan.apk`.
-
-Sur Android : ouvre le fichier, autorise « installer des applis inconnues » si demandé, puis Installer.
+## Compilation
+Branche `rcsc-app` (code) → branche `master` : chaque push sur `master` compile l'APK via GitHub Actions
+et le publie dans les **Releases**.
