@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+<title>RCSC Zèbres</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header id="top">
+  <div class="brand">
+    <svg class="crest" viewBox="0 0 64 72" aria-hidden="true">
+      <path d="M32 2 L60 10 L60 36 C60 52 48 62 32 70 C16 62 4 52 4 36 L4 10 Z" fill="#fff"/>
+      <path d="M32 7 L55 14 L55 36 C55 49 45 57 32 64 C19 57 9 49 9 36 L9 14 Z" fill="#000"/>
+      <path d="M17 12 L23 10.5 L23 59 L17 54 Z M29 8.5 L35 8.5 L35 64 L32 65.5 L29 64 Z M41 10.5 L47 12 L47 54 L41 59 Z" fill="#fff"/>
+    </svg>
+    <div>
+      <div class="title">RCSC Zèbres</div>
+      <div class="subtitle">Royal Charleroi Sporting Club</div>
+    </div>
+  </div>
+  <button class="icon-btn" data-refresh title="Actualiser">⟳</button>
+</header>
+<nav id="tabs">
+  <button data-tab="home" class="on">Accueil</button>
+  <button data-tab="table">Classement</button>
+  <button data-tab="matches">Matchs</button>
+  <button data-tab="squad">Effectif</button>
+  <button data-tab="news">Actus</button>
+  <button data-tab="mercato">Mercato</button>
+  <button data-tab="videos">Vidéos</button>
+  <button data-tab="club">Club</button>
+</nav>
+<main id="content"></main>
+<div id="modal" class="modal hidden">
+  <div class="sheet">
+    <button class="close" data-close>✕</button>
+    <div id="modal-body"></div>
+  </div>
+</div>
+<script src="app.js"></script>
+</body>
+</html>
