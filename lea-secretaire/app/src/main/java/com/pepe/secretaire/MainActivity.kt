@@ -9,7 +9,6 @@ import android.graphics.Color
 import android.graphics.drawable.GradientDrawable
 import android.os.Bundle
 import android.text.InputType
-import android.util.Base64
 import android.view.Gravity
 import android.view.View
 import android.view.inputmethod.EditorInfo
@@ -27,10 +26,11 @@ class MainActivity : Activity() {
 
     companion object {
         const val NAME = "Léa"
-        const val CHAT_URL = "https://api.openai.com/v1/chat/completions"
-        const val IMG_URL = "https://api.openai.com/v1/images/generations"
-        const val CHAT_MODEL = "gpt-4o-mini"
-        const val IMG_MODEL = "gpt-image-1"
+        // Conversation : Google Gemini (clé gratuite, sans carte bancaire)
+        const val CHAT_URL = "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions"
+        val CHAT_MODELS = listOf("gemini-flash-latest", "gemini-2.5-flash", "gemini-flash-lite-latest", "gemini-2.5-flash-lite")
+        // Photos : Pollinations (gratuit, sans clé)
+        const val IMG_URL = "https://image.pollinations.ai/prompt/"
 
         val PERSONA = """
             Tu es Léa, 32 ans, la secrétaire virtuelle personnelle de l'utilisateur. Tu es un personnage
@@ -237,8 +237,20 @@ class MainActivity : Activity() {
         val typing = bubble("$NAME écrit…", false)
         Thread {
             try {
-                val body = JSONObject().put("model", CHAT_MODEL).put("messages", msgs).put("temperature", 0.9)
-                val r = post(CHAT_URL, body, key)
+                var r: JSONObject? = null
+                var last: Exception? = null
+                for (m in CHAT_MODELS) {
+                    try {
+                        val body = JSONObject().put("model", m).put("messages", msgs).put("temperature", 0.9)
+                        r = post(CHAT_URL, body, key)
+                        break
+                    } catch (e: Exception) {
+                        last = e
+                        val msg = (e.message ?: "").lowercase()
+                        if (!(msg.contains("model") || msg.contains("not found") || msg.contains("404"))) throw e
+                    }
+                }
+                if (r == null) throw last ?: Exception("Aucun modèle disponible")
                 val reply = r.getJSONArray("choices").getJSONObject(0)
                     .getJSONObject("message").optString("content").trim()
                 runOnUiThread {
@@ -254,8 +266,6 @@ class MainActivity : Activity() {
     }
 
     private fun photo() {
-        val key = key()
-        if (key.isBlank()) { settings(); return }
         val t = input.text.toString().trim()
         val pose = if (t.isEmpty()) "assise à son bureau, souriante, en tailleur chic" else t
         input.setText("")
@@ -264,15 +274,19 @@ class MainActivity : Activity() {
         Thread {
             try {
                 val prompt = "$LOOK Pose, outfit and setting requested (may be in French): $pose. $SAFE"
-                val body = JSONObject()
-                    .put("model", IMG_MODEL)
-                    .put("prompt", prompt)
-                    .put("size", "1024x1536")
-                    .put("quality", "medium")
-                val r = post(IMG_URL, body, key)
-                val b64 = r.getJSONArray("data").getJSONObject(0).getString("b64_json")
-                val bytes = Base64.decode(b64, Base64.DEFAULT)
+                val enc = java.net.URLEncoder.encode(prompt, "UTF-8").replace("+", "%20")
+                val seed = (1..999999).random()
+                val url = "$IMG_URL$enc?width=768&height=1152&nologo=true&safe=true&seed=$seed"
+                val c = URL(url).openConnection() as HttpURLConnection
+                c.connectTimeout = 30000
+                c.readTimeout = 180000
+                val code = c.responseCode
+                if (code !in 200..299) {
+                    throw Exception(if (code == 429) "trop de demandes, réessaie dans 20 secondes" else "erreur $code")
+                }
+                val bytes = c.inputStream.use { it.readBytes() }
                 val bmp = BitmapFactory.decodeByteArray(bytes, 0, bytes.size)
+                    ?: throw Exception("image illisible, réessaie")
                 runOnUiThread {
                     list.removeView(wait)
                     showImage(bmp)
@@ -289,11 +303,11 @@ class MainActivity : Activity() {
             setPadding(dp(20), dp(8), dp(20), 0)
         }
         val info = TextView(this).apply {
-            text = "Colle ta clé API OpenAI (elle commence par sk-). Elle reste uniquement sur ton téléphone."
+            text = "Colle ta clé Google Gemini GRATUITE (elle commence par AIza). Crée-la sur aistudio.google.com/apikey avec ton compte Google, sans carte bancaire. Elle reste uniquement sur ton téléphone."
         }
         val field = EditText(this).apply {
             setText(key())
-            hint = "sk-…"
+            hint = "AIza…"
             inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD
         }
         box.addView(info)

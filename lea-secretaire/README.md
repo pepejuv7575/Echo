@@ -6,7 +6,7 @@ conversation libre, conseils, organisation, et photos d'elle générées selon l
 ## Installer
 1. Onglet **Releases** → « Léa – dernière version » → `Lea-secretaire.apk` → télécharger sur le téléphone.
 2. Ouvrir le fichier et autoriser « Installer des applis inconnues ».
-3. Au premier lancement, coller une clé API OpenAI (https://platform.openai.com/api-keys).
+3. Au premier lancement, coller une clé Google Gemini gratuite (https://aistudio.google.com/apikey), sans carte bancaire.
 
 ## Utiliser
 - Écris un message puis ➤ pour discuter.
