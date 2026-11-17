@@ -30,7 +30,8 @@ class MainActivity : Activity() {
         const val CHAT_URL = "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions"
         val CHAT_MODELS = listOf("gemini-flash-latest", "gemini-2.5-flash", "gemini-flash-lite-latest", "gemini-2.5-flash-lite")
         // Photos : Pollinations (gratuit, sans clé)
-        const val IMG_URL = "https://image.pollinations.ai/prompt/"
+        const val IMG_URL = "https://gen.pollinations.ai/image/"
+        const val IMG_URL_ANON = "https://image.pollinations.ai/prompt/"
 
         val PERSONA = """
             Tu es Léa, 32 ans, la secrétaire virtuelle personnelle de l'utilisateur. Tu es un personnage
@@ -158,6 +159,7 @@ class MainActivity : Activity() {
     }
 
     private fun key() = prefs.getString("key", "") ?: ""
+    private fun pkey() = prefs.getString("pkey", "") ?: ""
 
     private fun save() = prefs.edit().putString("hist", history.toString()).apply()
 
@@ -276,13 +278,22 @@ class MainActivity : Activity() {
                 val prompt = "$LOOK Pose, outfit and setting requested (may be in French): $pose. $SAFE"
                 val enc = java.net.URLEncoder.encode(prompt, "UTF-8").replace("+", "%20")
                 val seed = (1..999999).random()
-                val url = "$IMG_URL$enc?width=768&height=1152&nologo=true&safe=true&seed=$seed"
+                val pk = pkey()
+                val base = if (pk.isBlank()) IMG_URL_ANON else IMG_URL
+                val url = "$base$enc?model=flux&width=768&height=1152&nologo=true&safe=true&seed=$seed"
                 val c = URL(url).openConnection() as HttpURLConnection
                 c.connectTimeout = 30000
                 c.readTimeout = 180000
+                if (pk.isNotBlank()) c.setRequestProperty("Authorization", "Bearer $pk")
                 val code = c.responseCode
                 if (code !in 200..299) {
-                    throw Exception(if (code == 429) "trop de demandes, réessaie dans 20 secondes" else "erreur $code")
+                    val detail = try { c.errorStream?.bufferedReader()?.use { it.readText() }?.take(200) } catch (_: Exception) { null }
+                    throw Exception(when (code) {
+                        400 -> "demande refusée par le filtre (essaie une tenue habillée)"
+                        401, 402, 403 -> if (pk.isBlank()) "ajoute ta clé Pollinations gratuite dans ⚙️" else "clé Pollinations refusée ou crédit du jour épuisé"
+                        429 -> "trop de demandes, réessaie dans 20 secondes"
+                        else -> "erreur $code"
+                    } + (if (detail.isNullOrBlank()) "" else "\n($detail)"))
                 }
                 val bytes = c.inputStream.use { it.readBytes() }
                 val bmp = BitmapFactory.decodeByteArray(bytes, 0, bytes.size)
@@ -310,13 +321,26 @@ class MainActivity : Activity() {
             hint = "AIza…"
             inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD
         }
+        val info2 = TextView(this).apply {
+            text = "\nClé Pollinations GRATUITE pour les photos : crée un compte sur enter.pollinations.ai et copie ta clé."
+        }
+        val field2 = EditText(this).apply {
+            setText(pkey())
+            hint = "sk_… ou pk_…"
+            inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD
+        }
         box.addView(info)
         box.addView(field)
+        box.addView(info2)
+        box.addView(field2)
         AlertDialog.Builder(this)
             .setTitle("Réglages")
             .setView(box)
             .setPositiveButton("Enregistrer") { _, _ ->
-                prefs.edit().putString("key", field.text.toString().trim()).apply()
+                prefs.edit()
+                    .putString("key", field.text.toString().trim())
+                    .putString("pkey", field2.text.toString().trim())
+                    .apply()
             }
             .setNeutralButton("Effacer la conversation") { _, _ ->
                 history = JSONArray()
