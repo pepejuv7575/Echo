@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>Apprendre l'arabe</title>
+<style>
+:root{--p:#0f766e;--p2:#14b8a6;--bg:#f5f1e8;--card:#fff;--txt:#1f2937;--mut:#6b7280;--gold:#d4a017;--ok:#16a34a;--ko:#dc2626}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;font-family:system-ui,-apple-system,Roboto,sans-serif;background:var(--bg);color:var(--txt)}
+header{background:linear-gradient(135deg,var(--p),#115e59);color:#fff;padding:14px 16px;position:sticky;top:0;z-index:5;display:flex;align-items:center;gap:12px;box-shadow:0 2px 8px rgba(0,0,0,.15)}
+header .back{font-size:26px;line-height:1;background:rgba(255,255,255,.15);border:0;color:#fff;width:40px;height:40px;border-radius:12px}
+header h1{margin:0;font-size:19px;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+header .pts{background:rgba(255,255,255,.18);padding:6px 10px;border-radius:20px;font-size:14px;white-space:nowrap}
+main{padding:16px;max-width:720px;margin:0 auto;padding-bottom:40px}
+.ar{font-family:"Noto Naskh Arabic","Noto Sans Arabic","Amiri",serif;direction:rtl}
+.hero{text-align:center;padding:8px 0 18px}
+.hero .ar{font-size:40px;color:var(--p)}
+.hero div{color:var(--mut)}
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+.tile{background:var(--card);border-radius:18px;padding:16px 14px;box-shadow:0 2px 8px rgba(0,0,0,.06);border:0;text-align:left;font:inherit;color:inherit}
+.tile:active,.lt:active,.opt:active,.btn:active{transform:scale(.97)}
+.tile .ic{font-size:30px;height:40px}
+.tile b{display:block;margin-top:6px;font-size:16px}
+.tile small{color:var(--mut);font-size:13px}
+.bar{height:6px;background:#e5e7eb;border-radius:4px;margin-top:10px;overflow:hidden}.bar i{display:block;height:100%;background:var(--p2)}
+.letters{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;direction:rtl}
+.lt{background:var(--card);border:0;border-radius:14px;padding:8px 4px;box-shadow:0 2px 6px rgba(0,0,0,.05);font:inherit;color:inherit;position:relative;direction:ltr}
+.lt .ar{font-size:34px;display:block;line-height:1.5}
+.lt small{font-size:12px;color:var(--mut)}
+.lt.seen::after{content:"✓";position:absolute;top:4px;right:7px;color:var(--ok);font-size:12px}
+.card{background:var(--card);border-radius:18px;padding:16px 18px;box-shadow:0 2px 8px rgba(0,0,0,.06);margin-bottom:14px}
+.big{font-size:110px;text-align:center;color:var(--p);line-height:1.35}
+.forms{display:grid;grid-template-columns:repeat(4,1fr);text-align:center;gap:6px}
+.forms .ar{font-size:38px;line-height:1.6}
+.forms small{color:var(--mut);font-size:12px}
+.btn{background:var(--p);color:#fff;border:0;border-radius:14px;padding:14px 16px;font:inherit;font-weight:600;font-size:16px;width:100%;margin-top:10px}
+.btn.sec{background:#e6f4f1;color:var(--p)}
+.row{display:flex;gap:10px}.row .btn{flex:1}
+.spk{background:#e6f4f1;color:var(--p);border:0;border-radius:50%;width:46px;height:46px;font-size:20px;flex:none}
+.word{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid #f0ece2}
+.word:last-child{border:0}
+.word .ar{font-size:28px;line-height:1.5}
+.word .fr{flex:1}
+.word .fr small{display:block;color:var(--mut);margin-top:2px}
+.opt{display:block;width:100%;background:var(--card);border:2px solid #e5e7eb;border-radius:14px;padding:14px;margin-top:10px;font:inherit;font-size:17px;color:inherit;text-align:center}
+.opt.ar{font-size:30px;padding:8px}
+.opt small{color:var(--mut)}
+.opt.ok{border-color:var(--ok);background:#dcfce7}.opt.ko{border-color:var(--ko);background:#fee2e2}
+.q{font-size:68px;text-align:center;color:var(--p);margin:4px 0;line-height:1.5}
+.qfr{font-size:26px;text-align:center;font-weight:700;margin:10px 0}
+.prog{color:var(--mut);text-align:center;font-size:14px;margin:6px 0}
+.pbar{height:8px;background:#e5e7eb;border-radius:4px;overflow:hidden;margin-bottom:12px}.pbar i{display:block;height:100%;background:var(--gold);transition:width .3s}
+.flash{min-height:260px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center}
+.flash .ar{font-size:64px;color:var(--p);line-height:1.5}
+.syl{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.syl button{background:#f8fafc;border:1px solid #e5e7eb;border-radius:12px;padding:6px;font:inherit;color:inherit}
+.syl .ar{font-size:30px;display:block;line-height:1.6}
+.syl small{color:var(--mut)}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#111827;color:#fff;padding:12px 16px;border-radius:12px;font-size:14px;width:max-content;max-width:90%;z-index:20;opacity:0;transition:opacity .3s;pointer-events:none;text-align:center}
+.toast.show{opacity:1}
+h2{font-size:17px;margin:18px 0 10px}
+p{line-height:1.55}
+.tip{background:#fff8e1;border-left:4px solid var(--gold);padding:10px 12px;border-radius:8px;font-size:14px;line-height:1.5}
+ul{padding-left:20px;line-height:1.6}
+</style>
+</head>
+<body>
+<header><button class="back" id="back" onclick="goBack()">‹</button><h1 id="title">Apprendre l'arabe</h1><span class="pts" id="pts">⭐ 0</span></header>
+<main id="app"></main>
+<div class="toast" id="toast"></div>
+<script>
+// [lettre, nom, nom arabe, son, conseil, mot exemple, translittération, sens, se lie à la suivante]
+const L=[
+["ا","Alif","أَلِف","a / â","Sert de support aux voyelles et note le « â » long.","أَسَد","asad","lion",0],
+["ب","Bâ'","بَاء","b","Comme le « b » français.","بَاب","bâb","porte",1],
+["ت","Tâ'","تَاء","t","Comme le « t » français.","تُفَّاح","touffâh","pommes",1],
+["ث","Thâ'","ثَاء","th","Comme le « th » anglais de « think ».","ثَعْلَب","tha'lab","renard",1],
+["ج","Jîm","جِيم","j / dj","« dj » comme dans « djinn » (souvent « j » au Maghreb).","جَمَل","jamal","chameau",1],
+["ح","Hâ'","حَاء","ḥ","« h » soufflé du fond de la gorge, comme pour embuer une vitre.","حَلِيب","halîb","lait",1],
+["خ","Khâ'","خَاء","kh","Comme la « jota » espagnole ou le « ch » allemand de « Bach ».","خُبْز","khoubz","pain",1],
+["د","Dâl","دَال","d","Comme le « d » français.","دَجَاجَة","dajâja","poule",0],
+["ذ","Dhâl","ذَال","dh","Comme le « th » anglais de « this ».","ذَهَب","dhahab","or",0],
+["ر","Râ'","رَاء","r","« r » roulé, comme en espagnol.","رُمَّان","roummân","grenade",0],
+["ز","Zây","زَاي","z","Comme le « z » français.","زَيْت","zayt","huile",0],
+["س","Sîn","سِين","s","Toujours « s » comme dans « sel ».","سَمَك","samak","poisson",1],
+["ش","Chîn","شِين","ch","Comme le « ch » de « chat ».","شَمْس","chams","soleil",1],
+["ص","Sâd","صَاد","ṣ","« s » emphatique : langue plaquée, son plus grave.","صَقْر","saqr","faucon",1],
+["ض","Dâd","ضَاد","ḍ","« d » emphatique, son grave et profond. L'arabe est appelé « la langue du Dâd » !","ضِفْدَع","difda'","grenouille",1],
+["ط","Tâ'","طَاء","ṭ","« t » emphatique, son grave.","طَائِرَة","tâ'ira","avion",1],
+["ظ","Zhâ'","ظَاء","ẓ","« dh » emphatique (le « th » de « this », appuyé).","ظَرْف","zharf","enveloppe",1],
+["ع","'Ayn","عَيْن","'","Son guttural sans équivalent : on contracte le fond de la gorge.","عَيْن","'ayn","œil",1],
+["غ","Ghayn","غَيْن","gh","Proche du « r » grasseyé parisien.","غَزَال","ghazâl","gazelle",1],
+["ف","Fâ'","فَاء","f","Comme le « f » français.","فِيل","fîl","éléphant",1],
+["ق","Qâf","قَاف","q","« k » prononcé très au fond de la gorge.","قَمَر","qamar","lune",1],
+["ك","Kâf","كَاف","k","Comme le « k » français.","كِتَاب","kitâb","livre",1],
+["ل","Lâm","لَام","l","Comme le « l » français.","لَيْمُون","laymoûn","citron",1],
+["م","Mîm","مِيم","m","Comme le « m » français.","مَاء","mâ'","eau",1],
+["ن","Noûn","نُون","n","Comme le « n » français.","نَجْمَة","najma","étoile",1],
+["ه","Hâ'","هَاء","h","« h » expiré et léger, comme dans l'anglais « hello ».","هِلَال","hilâl","croissant de lune",1],
+["و","Wâw","وَاو","w / oû","« w » ou voyelle longue « oû ».","وَرْدَة","warda","rose",0],
+["ي","Yâ'","يَاء","y / î","« y » ou voyelle longue « î ».","يَد","yad","main",1]
+];
+
+const CATS=[
+{id:"salut",ic:"👋",name:"Salutations",w:[
+["مَرْحَبًا","marhaban","bonjour / salut"],
+["السَّلَامُ عَلَيْكُمْ","as-salâmou 'alaykoum","que la paix soit sur vous"],
+["وَعَلَيْكُمُ السَّلَامُ","wa 'alaykoumou s-salâm","et sur vous la paix (réponse)"],
+["صَبَاحُ الخَيْرِ","sabâhou l-khayr","bonjour (le matin)"],
+["مَسَاءُ الخَيْرِ","masâ'ou l-khayr","bonsoir"],
+["كَيْفَ حَالُكَ؟","kayfa hâlouka ?","comment vas-tu ?"],
+["بِخَيْرٍ، الحَمْدُ لِلَّهِ","bi-khayr, al-hamdou lillâh","bien, Dieu merci"],
+["شُكْرًا","choukran","merci"],
+["عَفْوًا","'afwan","de rien / pardon"],
+["مِنْ فَضْلِكَ","min fadlika","s'il te plaît"],
+["نَعَمْ","na'am","oui"],
+["لَا","lâ","non"],
+["مَعَ السَّلَامَةِ","ma'a s-salâma","au revoir"]]},
+{id:"nb",ic:"🔢",name:"Nombres",w:[
+["صِفْر","sifr · ٠","0 — zéro"],
+["وَاحِد","wâhid · ١","1 — un"],
+["اِثْنَان","ithnân · ٢","2 — deux"],
+["ثَلَاثَة","thalâtha · ٣","3 — trois"],
+["أَرْبَعَة","arba'a · ٤","4 — quatre"],
+["خَمْسَة","khamsa · ٥","5 — cinq"],
+["سِتَّة","sitta · ٦","6 — six"],
+["سَبْعَة","sab'a · ٧","7 — sept"],
+["ثَمَانِيَة","thamâniya · ٨","8 — huit"],
+["تِسْعَة","tis'a · ٩","9 — neuf"],
+["عَشَرَة","'achara · ١٠","10 — dix"],
+["مِئَة","mi'a · ١٠٠","100 — cent"]]},
+{id:"coul",ic:"🎨",name:"Couleurs",w:[
+["أَحْمَر","ahmar","rouge"],
+["أَزْرَق","azraq","bleu"],
+["أَخْضَر","akhdar","vert"],
+["أَصْفَر","asfar","jaune"],
+["أَبْيَض","abyad","blanc"],
+["أَسْوَد","aswad","noir"],
+["بُرْتُقَالِيّ","bourtouqâlî","orange (couleur)"],
+["بُنِّيّ","bounnî","marron"],
+["وَرْدِيّ","wardî","rose (couleur)"]]},
+{id:"fam",ic:"👨‍👩‍👧",name:"Famille",w:[
+["عَائِلَة","'â'ila","famille"],
+["أَب","ab","père"],
+["أُمّ","oumm","mère"],
+["أَخ","akh","frère"],
+["أُخْت","oukht","sœur"],
+["اِبْن","ibn","fils"],
+["بِنْت","bint","fille"],
+["جَدّ","jadd","grand-père"],
+["جَدَّة","jadda","grand-mère"],
+["زَوْج","zawj","mari"],
+["زَوْجَة","zawja","épouse"],
+["صَدِيق","sadîq","ami"]]},
+{id:"nour",ic:"🍞",name:"Nourriture",w:[
+["خُبْز","khoubz","pain"],
+["مَاء","mâ'","eau"],
+["حَلِيب","halîb","lait"],
+["تُفَّاحَة","touffâha","une pomme"],
+["مَوْز","mawz","bananes"],
+["لَحْم","lahm","viande"],
+["دَجَاج","dajâj","poulet"],
+["أَرُزّ","arouzz","riz"],
+["قَهْوَة","qahwa","café"],
+["شَاي","châï","thé"],
+["سُكَّر","soukkar","sucre"],
+["مِلْح","milh","sel"]]},
+{id:"anim",ic:"🐪",name:"Animaux",w:[
+["قِطّ","qitt","chat"],
+["كَلْب","kalb","chien"],
+["حِصَان","hisân","cheval"],
+["جَمَل","jamal","chameau"],
+["أَسَد","asad","lion"],
+["طَائِر","tâ'ir","oiseau"],
+["سَمَكَة","samaka","poisson"],
+["بَقَرَة","baqara","vache"],
+["خَرُوف","kharoûf","mouton"],
+["فِيل","fîl","éléphant"]]},
+{id:"corps",ic:"🖐️",name:"Le corps",w:[
+["رَأْس","ra's","tête"],
+["عَيْن","'ayn","œil"],
+["أَنْف","anf","nez"],
+["فَم","fam","bouche"],
+["أُذُن","oudhoun","oreille"],
+["يَد","yad","main"],
+["رِجْل","rijl","jambe / pied"],
+["قَلْب","qalb","cœur"],
+["شَعْر","cha'r","cheveux"]]},
+{id:"jours",ic:"📅",name:"Jours",w:[
+["الأَحَد","al-ahad","dimanche"],
+["الاِثْنَيْن","al-ithnayn","lundi"],
+["الثُّلَاثَاء","ath-thoulâthâ'","mardi"],
+["الأَرْبِعَاء","al-arbi'â'","mercredi"],
+["الخَمِيس","al-khamîs","jeudi"],
+["الجُمُعَة","al-joumou'a","vendredi"],
+["السَّبْت","as-sabt","samedi"],
+["اليَوْم","al-yawm","aujourd'hui"],
+["غَدًا","ghadan","demain"],
+["أَمْس","ams","hier"]]},
+{id:"phr",ic:"💬",name:"Phrases utiles",w:[
+["أَنَا","anâ","je / moi"],
+["أَنْتَ","anta","tu (masculin)"],
+["أَنْتِ","anti","tu (féminin)"],
+["هُوَ","houwa","il / lui"],
+["هِيَ","hiya","elle"],
+["نَحْنُ","nahnou","nous"],
+["مَا اسْمُكَ؟","mâ smouka ?","comment t'appelles-tu ?"],
+["اِسْمِي ...","ismî ...","je m'appelle ..."],
+["أَيْنَ؟","ayna ?","où ?"],
+["مَاذَا؟","mâdhâ ?","quoi ?"],
+["كَمْ؟","kam ?","combien ?"],
+["لَا أَفْهَمُ","lâ afhamou","je ne comprends pas"],
+["أَتَكَلَّمُ قَلِيلًا مِنَ العَرَبِيَّةِ","atakallamou qalîlan mina l-'arabiyya","je parle un peu arabe"]]}
+];
+
+const VOW=[
+["بَ","Fatha","ba","Petit trait au-dessus de la lettre : son « a »."],
+["بِ","Kasra","bi","Petit trait en dessous : son « i »."],
+["بُ","Damma","bou","Petite boucle (comme un و) au-dessus : son « ou »."],
+["بْ","Soukoun","b","Petit rond : la lettre n'a pas de voyelle."],
+["بّ","Chadda","bb","Petit « w » au-dessus : la consonne est doublée."],
+["بً","Tanwîn fath","ban","Double fatha en fin de mot : « -an »."],
+["بٍ","Tanwîn kasr","bin","Double kasra : « -in »."],
+["بٌ","Tanwîn damm","boun","Double damma : « -oun »."]
+];
+const LONGV=[["بَا","bâ","fatha + alif = « â » long"],["بِي","bî","kasra + yâ' = « î » long"],["بُو","boû","damma + wâw = « oû » long"]];
+const SYL=[["ب","b"],["ت","t"],["د","d"],["ر","r"],["س","s"],["ك","k"],["ل","l"],["م","m"],["ن","n"]];
+
+// ---------- état ----------
+let S={pts:0,seen:{},best:{}};
+try{S=Object.assign(S,JSON.parse(localStorage.getItem("arabe")||"{}"))}catch(e){}
+function save(){try{localStorage.setItem("arabe",JSON.stringify(S))}catch(e){}updPts()}
+const $=id=>document.getElementById(id);
+const app=$("app");
+function updPts(){$("pts").textContent="⭐ "+S.pts}
+function shuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+
+// ---------- navigation ----------
+const stack=[];let SID=0;
+function show(fn,a){SID++;fn(...a);window.scrollTo(0,0)}
+function go(fn,...a){stack.push([fn,a]);show(fn,a)}
+function replace(fn,...a){stack[stack.length-1]=[fn,a];show(fn,a)}
+function goBack(){if(stack.length>1){stack.pop();const t=stack[stack.length-1];show(t[0],t[1]);return true}return false}
+function setTitle(t){$("title").textContent=t;$("back").style.visibility=stack.length>1?"visible":"hidden"}
+
+// ---------- son ----------
+let SAY=[],warned=false,tT;
+function sb(t){SAY.push(t);return `<button class="spk" onclick="event.stopPropagation();speak(SAY[${SAY.length-1}])">🔊</button>`}
+function toast(m){const t=$("toast");t.textContent=m;t.classList.add("show");clearTimeout(tT);tT=setTimeout(()=>t.classList.remove("show"),3500)}
+function speak(t){
+  t=String(t).replace(/\.\.\./g,"");
+  try{
+    if(window.Android){if(Android.speak(t))return}
+    else if(window.speechSynthesis){const u=new SpeechSynthesisUtterance(t);u.lang="ar-SA";u.rate=.8;speechSynthesis.cancel();speechSynthesis.speak(u);return}
+  }catch(e){}
+  if(!warned){warned=true;toast("Voix arabe indisponible : Paramètres › Synthèse vocale › Moteur Google › installer « Arabe ».")}
+}
+
+// ---------- données ----------
+function items(key){
+  if(key==="alpha")return L.map(l=>({ar:l[0],tr:l[3],fr:l[1],say:l[2]}));
+  const map=c=>c.w.map(w=>({ar:w[0],tr:w[1],fr:w[2],say:w[0]}));
+  if(key==="all")return CATS.flatMap(map);
+  return map(CATS.find(c=>c.id===key));
+}
+function keyName(k){if(k==="alpha")return"Alphabet";if(k==="all")return"Tout le vocabulaire";return CATS.find(c=>c.id===k).name}
+
+// ---------- écrans ----------
+function home(){
+  setTitle("Apprendre l'arabe");SAY=[];
+  const seen=Object.keys(S.seen).length;
+  const nb=CATS.reduce((n,c)=>n+c.w.length,0);
+  app.innerHTML=`<div class="hero"><div class="ar">تَعَلَّمِ العَرَبِيَّة</div><div>Apprends l'arabe pas à pas</div></div>
+  <div class="grid">
+    <button class="tile" onclick="go(intro)"><div class="ic">🧭</div><b>Bien commencer</b><small>Les bases à savoir</small></button>
+    <button class="tile" onclick="go(letters)"><div class="ic">🔤</div><b>Alphabet</b><small>${seen} / 28 lettres vues</small><div class="bar"><i style="width:${seen/28*100}%"></i></div></button>
+    <button class="tile" onclick="go(vowels)"><div class="ic">✏️</div><b>Voyelles</b><small>Les signes et les syllabes</small></button>
+    <button class="tile" onclick="go(vocab)"><div class="ic">📚</div><b>Vocabulaire</b><small>${nb} mots et expressions</small></button>
+    <button class="tile" onclick="go(chooser,'flash')"><div class="ic">🃏</div><b>Flashcards</b><small>Mémorise en t'amusant</small></button>
+    <button class="tile" onclick="go(chooser,'quiz')"><div class="ic">🎯</div><b>Quiz</b><small>Teste tes connaissances</small></button>
+  </div>
+  <p class="tip" style="margin-top:16px">💡 Astuce : touche 🔊 pour écouter la prononciation. Chaque bonne réponse te rapporte une ⭐.</p>`;
+}
+
+function intro(){
+  setTitle("Bien commencer");SAY=[];
+  app.innerHTML=`<div class="card"><h2 style="margin-top:0">📖 L'écriture arabe en 5 points</h2><ul>
+  <li>On lit et on écrit <b>de droite à gauche</b>.</li>
+  <li>L'alphabet compte <b>28 lettres</b>, presque toutes des consonnes.</li>
+  <li>Les lettres <b>s'attachent</b> entre elles et changent un peu de forme selon leur place : début, milieu ou fin du mot.</li>
+  <li>6 lettres (ا د ذ ر ز و) ne s'attachent <b>jamais</b> à la lettre suivante.</li>
+  <li>Les <b>voyelles courtes</b> sont de petits signes, souvent absents dans les textes courants.</li></ul></div>
+  <div class="card"><h2 style="margin-top:0">🗺️ Parcours conseillé</h2><ol style="padding-left:20px;line-height:1.7">
+  <li>Découvre l'alphabet, quelques lettres par jour.</li><li>Apprends les voyelles et lis les syllabes.</li>
+  <li>Révise avec les flashcards.</li><li>Valide avec les quiz (objectif : 80 % !).</li><li>Passe au vocabulaire thème par thème.</li></ol></div>
+  <div class="card"><div class="word"><span class="ar">العَرَبِيَّة</span><div class="fr"><b>la langue arabe</b><small>al-'arabiyya</small></div>${sb("العَرَبِيَّة")}</div></div>
+  <p class="tip">🔇 Pas de son ? Va dans Paramètres Android › Synthèse vocale (ou « Sortie de la synthèse vocale ») › Moteur Google › Installer les données vocales › <b>Arabe</b>.</p>
+  <button class="btn" onclick="replace(letters)">Commencer l'alphabet ›</button>`;
+}
+
+function letters(){
+  setTitle("L'alphabet");SAY=[];
+  app.innerHTML=`<p class="prog">Lecture de droite à gauche ← touche une lettre</p><div class="letters">${L.map((l,i)=>`<button class="lt ${S.seen[i]?"seen":""}" onclick="go(letter,${i})"><span class="ar">${l[0]}</span><small>${l[1]}</small></button>`).join("")}</div>
+  <button class="btn" style="margin-top:16px" onclick="go(quiz,'alpha')">🎯 Quiz de l'alphabet</button>`;
+}
+
+function letter(i){
+  const l=L[i];if(!S.seen[i]){S.seen[i]=1;save()}
+  setTitle("Lettre "+(i+1)+" / 28 — "+l[1]);SAY=[];
+  const f=l[8]?[l[0],l[0]+"ـ","ـ"+l[0]+"ـ","ـ"+l[0]]:[l[0],l[0],"ـ"+l[0],"ـ"+l[0]];
+  app.innerHTML=`<div class="card"><div class="big ar">${l[0]}</div>
+  <div style="display:flex;align-items:center;gap:12px"><div style="flex:1"><b style="font-size:20px">${l[1]}</b> &nbsp;<span class="ar" style="font-size:24px">${l[2]}</span><br><span style="color:var(--mut)">Son : <b>${l[3]}</b></span></div>${sb(l[2])}</div>
+  <p class="tip">${l[4]}</p></div>
+  <h2>Les 4 formes</h2><div class="card forms">${["Isolée","Début","Milieu","Fin"].map((n,k)=>`<div><div class="ar">${f[k]}</div><small>${n}</small></div>`).join("")}</div>
+  ${l[8]?"":`<p class="tip">⚠️ Cette lettre ne s'attache jamais à la lettre qui la suit (à sa gauche).</p>`}
+  <h2>Exemple</h2><div class="card"><div class="word"><span class="ar">${l[5]}</span><div class="fr"><b>${l[7]}</b><small>${l[6]}</small></div>${sb(l[5])}</div></div>
+  <div class="row">${i>0?`<button class="btn sec" onclick="replace(letter,${i-1})">‹ ${L[i-1][1]}</button>`:""}${i<27?`<button class="btn" onclick="replace(letter,${i+1})">${L[i+1][1]} ›</button>`:`<button class="btn" onclick="replace(quiz,'alpha')">Quiz 🎯</button>`}</div>`;
+}
+
+function vowels(){
+  setTitle("Les voyelles");SAY=[];
+  app.innerHTML=`<div class="card"><p style="margin:0">En arabe, les <b>voyelles courtes</b> sont de petits signes (<span class="ar">حَرَكَات</span>, harakât) placés au-dessus ou en dessous des lettres. Exemple avec la lettre <span class="ar" style="font-size:22px">ب</span> (b) :</p></div>
+  <div class="card">${VOW.map(v=>`<div class="word"><span class="ar" style="font-size:42px;width:56px;text-align:center">${v[0]}</span><div class="fr"><b>${v[1]}</b> — « ${v[2]} »<small>${v[3]}</small></div>${sb(v[0])}</div>`).join("")}</div>
+  <h2>Voyelles longues</h2><div class="card">${LONGV.map(v=>`<div class="word"><span class="ar" style="font-size:40px;width:56px;text-align:center">${v[0]}</span><div class="fr"><b>« ${v[1]} »</b><small>${v[2]}</small></div>${sb(v[0])}</div>`).join("")}</div>
+  <h2>Entraînement : lis les syllabes</h2><p class="prog">Lis à voix haute, puis touche pour vérifier 🔊</p>
+  <div class="card syl">${SYL.flatMap(s=>[["َ","a"],["ِ","i"],["ُ","ou"]].map(v=>{SAY.push(s[0]+v[0]);return `<button onclick="speak(SAY[${SAY.length-1}])"><span class="ar">${s[0]+v[0]}</span><small>${s[1]+v[1]}</small></button>`})).join("")}</div>`;
+}
+
+function vocab(){
+  setTitle("Vocabulaire");SAY=[];
+  app.innerHTML=`<div class="grid">${CATS.map(c=>`<button class="tile" onclick="go(cat,'${c.id}')"><div class="ic">${c.ic}</div><b>${c.name}</b><small>${c.w.length} mots${S.best[c.id]!=null?" · quiz "+S.best[c.id]+"%":""}</small></button>`).join("")}</div>`;
+}
+
+function cat(id){
+  const c=CATS.find(x=>x.id===id);setTitle(c.ic+" "+c.name);SAY=[];
+  app.innerHTML=`<div class="row" style="margin-top:-10px"><button class="btn sec" onclick="go(flash,'${id}')">🃏 Flashcards</button><button class="btn" onclick="go(quiz,'${id}')">🎯 Quiz</button></div>
+  <div class="card" style="margin-top:14px">${c.w.map(w=>`<div class="word"><div class="fr"><b>${w[2]}</b><small>${w[1]}</small></div><span class="ar">${w[0]}</span>${sb(w[0])}</div>`).join("")}</div>`;
+}
+
+function chooser(mode){
+  setTitle(mode==="quiz"?"Quiz":"Flashcards");SAY=[];
+  const o=[["alpha","🔤","Alphabet"],...CATS.map(c=>[c.id,c.ic,c.name]),["all","🌍","Tout le vocabulaire"]];
+  app.innerHTML=`<p>Choisis un thème :</p><div class="grid">${o.map(x=>`<button class="tile" onclick="go(${mode},'${x[0]}')"><div class="ic">${x[1]}</div><b>${x[2]}</b><small>${mode==="quiz"&&S.best[x[0]]!=null?"Meilleur : "+S.best[x[0]]+"%":"&nbsp;"}</small></button>`).join("")}</div>`;
+}
+
+// ---------- flashcards ----------
+let F;
+function flash(key){F={key,deck:shuffle(items(key)),i:0,flip:false,known:0,total:0};setTitle("🃏 "+keyName(key));rF()}
+function rF(){
+  SAY=[];const c=F.deck[F.i];
+  if(!c){app.innerHTML=`<div class="card" style="text-align:center"><div style="font-size:56px">🎉</div><h2>Paquet terminé !</h2><p>Toutes les cartes sont acquises.<br>Bonnes réponses du premier coup : <b>${F.known} / ${new Set(F.deck.map(d=>d.ar)).size}</b></p><button class="btn" onclick="flash(F.key)">Recommencer</button><button class="btn sec" onclick="goBack()">Retour</button></div>`;return}
+  const left=F.deck.length-F.i;
+  app.innerHTML=`<p class="prog">Reste ${left} carte${left>1?"s":""}</p>
+  <div class="card flash" onclick="F.flip=!F.flip;rF()">${F.flip
+    ?`<div class="ar" style="font-size:44px">${c.ar}</div><div style="color:var(--mut);margin:6px">${c.tr}</div><div class="qfr">${c.fr}</div>`
+    :`<div class="ar">${c.ar}</div><p style="color:var(--mut)">Touche la carte pour la retourner</p>`}</div>
+  <button class="btn sec" onclick="speak(F.deck[F.i].say)">🔊 Écouter</button>
+  ${F.flip?`<div class="row"><button class="btn" style="background:var(--ko)" onclick="fA(0)">À revoir ↺</button><button class="btn" style="background:var(--ok)" onclick="fA(1)">Je savais ✓</button></div>`:""}`;
+}
+function fA(ok){
+  const c=F.deck[F.i];
+  if(ok){if(!c.miss){F.known++;S.pts++;save()}}else{c.miss=1;F.deck.push(c)}
+  F.i++;F.flip=false;rF();
+}
+
+// ---------- quiz ----------
+let Q;
+function quiz(key){
+  const pool=items(key);
+  const qs=shuffle(pool).slice(0,10).map(it=>{
+    const others=shuffle(pool.filter(o=>o.fr!==it.fr&&o.ar!==it.ar)).slice(0,3);
+    return {it,dir:Math.random()<.5?0:1,opts:shuffle([it,...others])};
+  });
+  Q={key,qs,i:0,score:0,locked:false};setTitle("🎯 "+keyName(key));rQ();
+}
+function rQ(){
+  SAY=[];const q=Q.qs[Q.i],n=Q.qs.length,A=Q.key==="alpha";
+  if(!q){
+    const pct=Math.round(Q.score*100/n),prev=S.best[Q.key];
+    const rec=prev==null||pct>prev;if(rec){S.best[Q.key]=pct;save()}
+    app.innerHTML=`<div class="card" style="text-align:center"><div style="font-size:60px">${pct>=80?"🏆":pct>=50?"👍":"💪"}</div><h2>${Q.score} / ${n} — ${pct}%</h2>
+    <p>${pct>=80?"Excellent ! <span class='ar'>مُمْتَاز</span>":pct>=50?"Bien joué, continue !":"Continue à t'entraîner, tu vas y arriver !"}</p>
+    ${rec&&prev!=null?"<p>🎉 Nouveau record !</p>":""}
+    <button class="btn" onclick="quiz(Q.key)">Rejouer</button><button class="btn sec" onclick="goBack()">Retour</button></div>`;return;
+  }
+  const ask=q.dir===0
+    ?`<div class="q ar">${q.it.ar}</div><div style="text-align:center">${sb(q.it.say)}</div><p class="prog">${A?"Quelle est cette lettre ?":"Que signifie ce mot ?"}</p>`
+    :`<div class="qfr">${q.it.fr}${A?` <span style="color:var(--mut);font-weight:400">(${q.it.tr})</span>`:""}</div><p class="prog">${A?"Trouve cette lettre":"Choisis le mot arabe"}</p>`;
+  app.innerHTML=`<div class="pbar"><i style="width:${Q.i/n*100}%"></i></div><p class="prog">Question ${Q.i+1} / ${n} · Score ${Q.score}</p>
+  <div class="card">${ask}</div>
+  ${q.opts.map((o,k)=>`<button class="opt ${q.dir?"ar":""}" onclick="ans(${k})">${q.dir?o.ar:o.fr+(A?` <small>(${o.tr})</small>`:"")}</button>`).join("")}`;
+}
+function ans(k){
+  if(Q.locked)return;Q.locked=true;
+  const q=Q.qs[Q.i],good=q.opts.indexOf(q.it),b=document.querySelectorAll(".opt");
+  b[good].classList.add("ok");
+  if(k===good){Q.score++;S.pts++;save()}else b[k].classList.add("ko");
+  speak(q.it.say);
+  const s=SID;
+  setTimeout(()=>{if(s!==SID)return;Q.i++;Q.locked=false;rQ()},k===good?1000:2000);
+}
+
+updPts();go(home);
+</script>
+</body>
+</html>
