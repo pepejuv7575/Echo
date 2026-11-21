@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>Impara l'italiano</title>
+<style>
+:root{--g:#009246;--g2:#00753a;--r:#ce2b37;--bg:#fbf7f0;--card:#fff;--txt:#1f2937;--mut:#6b7280;--gold:#e0a800;--ok:#16a34a;--ko:#dc2626;--lg:#e8f5ee}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;font-family:system-ui,-apple-system,Roboto,sans-serif;background:var(--bg);color:var(--txt)}
+header{background:linear-gradient(135deg,var(--g),var(--g2));color:#fff;padding:14px 16px;position:sticky;top:0;z-index:5;display:flex;align-items:center;gap:12px;box-shadow:0 2px 8px rgba(0,0,0,.15)}
+header::after{content:"";position:absolute;left:0;right:0;bottom:-4px;height:4px;background:linear-gradient(90deg,var(--g) 33%,#fff 33% 66%,var(--r) 66%)}
+header .back{font-size:26px;line-height:1;background:rgba(255,255,255,.15);border:0;color:#fff;width:40px;height:40px;border-radius:12px}
+header h1{margin:0;font-size:18px;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+header .pts{background:rgba(255,255,255,.18);padding:6px 10px;border-radius:20px;font-size:14px;white-space:nowrap}
+main{padding:18px 16px 40px;max-width:720px;margin:0 auto}
+button{font:inherit;color:inherit}
+button:active{transform:scale(.97)}
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+.tile{background:var(--card);border-radius:18px;padding:16px 14px;box-shadow:0 2px 8px rgba(0,0,0,.06);border:0;text-align:left}
+.tile .ic{font-size:30px;height:40px}
+.tile b{display:block;margin-top:6px;font-size:16px}
+.tile small{color:var(--mut);font-size:13px}
+.tile.wide{grid-column:1/-1;display:flex;align-items:center;gap:14px}
+.tile.wide .ic{height:auto;font-size:38px}
+.card{background:var(--card);border-radius:18px;padding:16px 18px;box-shadow:0 2px 8px rgba(0,0,0,.06);margin-bottom:14px}
+.center{text-align:center}
+.lvl{display:flex;align-items:center;gap:14px}
+.lvl .badge{width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,var(--g),var(--r));color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:22px;flex:none}
+.bar{height:8px;background:#e5e7eb;border-radius:4px;margin-top:8px;overflow:hidden}.bar i{display:block;height:100%;background:linear-gradient(90deg,var(--g),var(--gold));transition:width .4s}
+.hero{text-align:center;margin:4px 0 14px}
+.hero h2{font-size:30px;margin:0;color:var(--g2)}
+.hero p{margin:4px 0 0;color:var(--mut)}
+.btn{background:var(--g);color:#fff;border:0;border-radius:14px;padding:14px 16px;font-weight:600;font-size:16px;width:100%;margin-top:10px}
+.btn.sec{background:var(--lg);color:var(--g2)}
+.btn.red{background:var(--r)}
+.row{display:flex;gap:10px}.row .btn{flex:1}
+.spk{background:var(--lg);color:var(--g2);border:0;border-radius:50%;width:44px;height:44px;font-size:19px;flex:none}
+.word{display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid #f0ece2}
+.word:last-child{border:0}
+.word .it{flex:1;font-size:19px;font-weight:600;color:var(--g2)}
+.word .it small{display:block;color:var(--mut);font-weight:400;font-size:14px;margin-top:2px}
+.opt{display:block;width:100%;background:var(--card);border:2px solid #e5e7eb;border-radius:14px;padding:14px;margin-top:10px;font-size:17px;text-align:center}
+.opt.ok{border-color:var(--ok);background:#dcfce7}.opt.ko{border-color:var(--ko);background:#fee2e2}
+.opt.left{text-align:left}
+.opt small{display:block;color:var(--mut);font-size:13px;margin-top:3px}
+.q{font-size:34px;text-align:center;font-weight:800;color:var(--g2);margin:8px 0}
+.prog{color:var(--mut);text-align:center;font-size:14px;margin:6px 0}
+.pbar{height:8px;background:#e5e7eb;border-radius:4px;overflow:hidden;margin-bottom:10px}.pbar i{display:block;height:100%;background:var(--gold);transition:width .3s}
+.flash{min-height:250px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center}
+.flash .big{font-size:38px;font-weight:800;color:var(--g2)}
+.tip{background:#fff8e1;border-left:4px solid var(--gold);padding:10px 12px;border-radius:8px;font-size:14px;line-height:1.5}
+.fb{background:#fee2e2;border-left:4px solid var(--ko);padding:10px 12px;border-radius:8px;font-size:14px;margin-top:10px}
+h3{font-size:16px;margin:18px 0 8px}
+p{line-height:1.55}
+/* chat */
+.scene-head{display:flex;gap:12px;align-items:center}
+.scene-head .ic{font-size:40px}
+.chat{display:flex;flex-direction:column;gap:8px;margin:12px 0}
+.msg{max-width:84%;padding:10px 13px;border-radius:16px;line-height:1.4;font-size:16px;position:relative}
+.msg small{display:block;font-size:13px;opacity:.75;margin-top:4px}
+.msg .who{display:block;font-size:12px;font-weight:700;opacity:.7;margin-bottom:2px}
+.msg.npc{background:#fff;align-self:flex-start;border-bottom-left-radius:4px;box-shadow:0 1px 4px rgba(0,0,0,.08)}
+.msg.me{background:var(--g);color:#fff;align-self:flex-end;border-bottom-right-radius:4px}
+.msg.narr{align-self:center;background:#fff3cd;font-style:italic;font-size:14px;text-align:center;max-width:95%}
+.msg.npc .spk2{background:none;border:0;font-size:16px;padding:0 0 0 6px}
+.toggle{display:flex;justify-content:flex-end}
+.toggle button{background:none;border:1px solid #d1d5db;border-radius:20px;padding:5px 12px;font-size:13px;color:var(--mut)}
+.stars{font-size:34px;letter-spacing:4px;color:var(--gold)}
+/* jeux */
+.mem{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.mc{height:84px;border:0;border-radius:14px;background:linear-gradient(135deg,var(--g),var(--g2));color:#fff;font-size:26px;font-weight:800;box-shadow:0 2px 6px rgba(0,0,0,.1);padding:4px}
+.mc.up{background:#fff;color:var(--txt);font-size:15px;font-weight:600;border:2px solid #e5e7eb}
+.mc.up.it{color:var(--g2)}
+.mc.found{background:#dcfce7;border-color:var(--ok)}
+.chips{display:flex;flex-wrap:wrap;gap:8px;min-height:52px;padding:8px;border-radius:14px}
+.ans{background:#fff;border:2px dashed #d1d5db}
+.ans.ok{border:2px solid var(--ok);background:#dcfce7}.ans.ko{border:2px solid var(--ko);background:#fee2e2}
+.chip{background:var(--card);border:2px solid var(--g);color:var(--g2);border-radius:12px;padding:9px 13px;font-size:17px;font-weight:600}
+.chip.used{visibility:hidden}
+.letters{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
+.letter{width:48px;height:52px;border-radius:12px;border:0;background:var(--g);color:#fff;font-size:22px;font-weight:800;text-transform:uppercase}
+.letter.used{opacity:.2}
+.slots{display:flex;gap:6px;justify-content:center;margin:14px 0;flex-wrap:wrap}
+.slot{width:38px;height:46px;border-bottom:3px solid var(--g);font-size:24px;font-weight:800;text-transform:uppercase;display:flex;align-items:center;justify-content:center}
+.slots.ok .slot{color:var(--ok);border-color:var(--ok)}.slots.ko .slot{color:var(--ko);border-color:var(--ko)}
+.timer{font-size:44px;font-weight:800;text-align:center;color:var(--r)}
+.vf{font-size:30px;font-weight:800;text-align:center;padding:26px 10px}
+.vf small{display:block;font-size:22px;color:var(--mut);font-weight:600;margin-top:8px}
+.flashok{animation:fo .4s}.flashko{animation:fk .4s}
+@keyframes fo{0%{background:#bbf7d0}100%{background:#fff}}@keyframes fk{0%{background:#fecaca}100%{background:#fff}}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#111827;color:#fff;padding:12px 16px;border-radius:12px;font-size:14px;width:max-content;max-width:90%;z-index:20;opacity:0;transition:opacity .3s;pointer-events:none;text-align:center}
+.toast.show{opacity:1}
+.pr b{color:var(--r)}
+</style>
+</head>
+<body>
+<header><button class="back" id="back" onclick="goBack()">‹</button><h1 id="title">Impara l'italiano</h1><span class="pts" id="pts">⭐ 0</span></header>
+<main id="app"></main>
+<div class="toast" id="toast"></div>
+<script>
+// ================== DONNÉES ==================
+const V=[
+{id:"saluti",ic:"👋",name:"Salutations",w:[
+["Ciao","salut (familier)"],["Buongiorno","bonjour"],["Buonasera","bonsoir"],["Buonanotte","bonne nuit"],["Arrivederci","au revoir"],
+["Grazie","merci"],["Prego","de rien / je vous en prie"],["Per favore","s'il vous plaît"],["Scusi","excusez-moi"],["Sì","oui"],["No","non"],
+["Come stai?","comment vas-tu ?"],["Bene, grazie","bien, merci"],["Piacere","enchanté(e)"]]},
+{id:"numeri",ic:"🔢",name:"Nombres",w:[
+["uno","1 — un"],["due","2 — deux"],["tre","3 — trois"],["quattro","4 — quatre"],["cinque","5 — cinq"],["sei","6 — six"],
+["sette","7 — sept"],["otto","8 — huit"],["nove","9 — neuf"],["dieci","10 — dix"],["venti","20 — vingt"],["cento","100 — cent"]]},
+{id:"colori",ic:"🎨",name:"Couleurs",w:[
+["rosso","rouge"],["blu","bleu"],["verde","vert"],["giallo","jaune"],["bianco","blanc"],["nero","noir"],
+["arancione","orange"],["rosa","rose"],["marrone","marron"],["grigio","gris"]]},
+{id:"cibo",ic:"🍝",name:"Nourriture",w:[
+["il pane","le pain"],["l'acqua","l'eau"],["il vino","le vin"],["il formaggio","le fromage"],["la carne","la viande"],["il pesce","le poisson"],
+["la mela","la pomme"],["il gelato","la glace"],["il caffè","le café"],["il latte","le lait"],["lo zucchero","le sucre"],["il conto","l'addition"]]},
+{id:"famiglia",ic:"👨‍👩‍👧",name:"Famille",w:[
+["la famiglia","la famille"],["il padre","le père"],["la madre","la mère"],["il fratello","le frère"],["la sorella","la sœur"],["il figlio","le fils"],
+["la figlia","la fille"],["il nonno","le grand-père"],["la nonna","la grand-mère"],["il marito","le mari"],["la moglie","l'épouse"],["l'amico","l'ami"]]},
+{id:"viaggio",ic:"✈️",name:"Voyage",w:[
+["la stazione","la gare"],["il treno","le train"],["l'aereo","l'avion"],["l'albergo","l'hôtel"],["la camera","la chambre"],["il biglietto","le billet"],
+["la valigia","la valise"],["la strada","la rue"],["a destra","à droite"],["a sinistra","à gauche"],["dritto","tout droit"],["la spiaggia","la plage"]]},
+{id:"verbi",ic:"🏃",name:"Verbes essentiels",w:[
+["essere","être"],["avere","avoir"],["andare","aller"],["fare","faire"],["mangiare","manger"],["bere","boire"],
+["parlare","parler"],["capire","comprendre"],["volere","vouloir"],["potere","pouvoir"],["dormire","dormir"],["comprare","acheter"]]},
+{id:"tempo",ic:"📅",name:"Jours & temps",w:[
+["lunedì","lundi"],["martedì","mardi"],["mercoledì","mercredi"],["giovedì","jeudi"],["venerdì","vendredi"],["sabato","samedi"],
+["domenica","dimanche"],["oggi","aujourd'hui"],["domani","demain"],["ieri","hier"],["la settimana","la semaine"],["l'ora","l'heure"]]},
+{id:"frasi",ic:"💬",name:"Phrases utiles",w:[
+["Mi chiamo...","je m'appelle..."],["Come ti chiami?","comment t'appelles-tu ?"],["Non capisco","je ne comprends pas"],["Parla francese?","parlez-vous français ?"],
+["Quanto costa?","combien ça coûte ?"],["Dov'è il bagno?","où sont les toilettes ?"],["Vorrei...","je voudrais..."],["Ho fame","j'ai faim"],
+["Ho sete","j'ai soif"],["Va bene","d'accord"],["Non lo so","je ne sais pas"],["Aiuto!","à l'aide !"]]}
+];
+
+const SENT=[
+["Mi chiamo Marco","Je m'appelle Marco"],
+["Vorrei un caffè per favore","Je voudrais un café s'il vous plaît"],
+["Dov'è la stazione?","Où est la gare ?"],
+["Quanto costa questo libro?","Combien coûte ce livre ?"],
+["Oggi fa molto caldo","Aujourd'hui il fait très chaud"],
+["Non parlo bene italiano","Je ne parle pas bien italien"],
+["Mia sorella abita a Roma","Ma sœur habite à Rome"],
+["Il conto per favore","L'addition s'il vous plaît"],
+["Domani vado al mare","Demain je vais à la mer"],
+["Mi piace molto la pizza","J'aime beaucoup la pizza"],
+["Siamo in vacanza in Italia","Nous sommes en vacances en Italie"],
+["A che ora parte il treno?","À quelle heure part le train ?"],
+["Ho una prenotazione per due","J'ai une réservation pour deux"],
+["Il gelato è buonissimo","La glace est délicieuse"]
+];
+
+// Mises en situation : o = [italien, français, correct(1/0), explication si faux]
+const SC=[
+{id:"bar",ic:"☕",it:"Al bar",fr:"Au café",who:"Barista",desc:"Commande un café comme un vrai Italien.",
+ tip:"En Italie, boire son café debout au comptoir (« al banco ») coûte moins cher qu'à table. Et un « caffè », c'est un expresso !",
+ steps:[
+ {npc:"Buongiorno! Cosa prende?",nfr:"Bonjour ! Qu'est-ce que vous prenez ?",o:[
+  ["Un cappuccino e un cornetto, per favore.","Un cappuccino et un croissant, s'il vous plaît.",1],
+  ["Buonanotte!","Bonne nuit !",0,"« Buonanotte » se dit seulement le soir, avant d'aller dormir."],
+  ["Mi chiamo Luca.","Je m'appelle Luca.",0,"Le barista te demande ce que tu veux commander, pas ton prénom."]]},
+ {npc:"Al banco o al tavolo?",nfr:"Au comptoir ou à table ?",o:[
+  ["Al banco, grazie.","Au comptoir, merci.",1],
+  ["Sì, sono francese.","Oui, je suis français.",0,"Il faut choisir : « banco » (comptoir) ou « tavolo » (table)."],
+  ["Ho fame.","J'ai faim.",0,"Réponds à la question : comptoir ou table ?"]]},
+ {npc:"Ecco a lei. Altro?",nfr:"Voici pour vous. Autre chose ?",o:[
+  ["No, grazie. Quanto costa?","Non, merci. Combien ça coûte ?",1],
+  ["Dov'è la stazione?","Où est la gare ?",0,"Hors sujet ! « Altro? » veut dire « autre chose ? »."],
+  ["Prego, signora.","Je vous en prie, madame.",0,"« Prego » sert à répondre à un merci."]]},
+ {npc:"Sono due euro e cinquanta.",nfr:"Ça fait deux euros cinquante.",o:[
+  ["Ecco. Grazie, arrivederci!","Voilà. Merci, au revoir !",1],
+  ["Buongiorno!","Bonjour !",0,"Tu as déjà dit bonjour : c'est le moment de payer et de dire au revoir."],
+  ["Due caffè!","Deux cafés !",0,"Il t'annonce le prix : il faut payer."]]}]},
+{id:"rist",ic:"🍝",it:"Al ristorante",fr:"Au restaurant",who:"Cameriere",desc:"Réserve, commande et demande l'addition.",
+ tip:"Le « coperto » qui apparaît sur l'addition est un petit supplément par personne pour le pain et le couvert : c'est normal en Italie.",
+ steps:[
+ {npc:"Buonasera! Avete prenotato?",nfr:"Bonsoir ! Vous avez réservé ?",o:[
+  ["Sì, un tavolo per due a nome Dupont.","Oui, une table pour deux au nom de Dupont.",1],
+  ["Il conto, per favore.","L'addition, s'il vous plaît.",0,"Tu viens d'arriver, pas encore l'addition !"],
+  ["Ho sete.","J'ai soif.",0,"Le serveur demande si tu as réservé (« prenotato »)."]]},
+ {npc:"Prego, accomodatevi. Cosa vi porto da bere?",nfr:"Je vous en prie, installez-vous. Que vous apporte-t-on à boire ?",o:[
+  ["Una bottiglia d'acqua naturale, per favore.","Une bouteille d'eau plate, s'il vous plaît.",1],
+  ["Una camera doppia.","Une chambre double.",0,"Ça, c'est pour l'hôtel ! « Bere » veut dire boire."],
+  ["A destra.","À droite.",0,"On te demande ce que tu veux boire."]]},
+ {npc:"Siete pronti per ordinare?",nfr:"Vous êtes prêts à commander ?",o:[
+  ["Sì, per me gli spaghetti alla carbonara.","Oui, pour moi les spaghettis à la carbonara.",1],
+  ["Sì, ho dormito bene.","Oui, j'ai bien dormi.",0,"« Ordinare » = commander : choisis un plat !"],
+  ["Un biglietto per Roma.","Un billet pour Rome.",0,"On n'est pas à la gare 😄"]]},
+ {npc:"Tutto bene? Vi è piaciuto?",nfr:"Tout va bien ? Ça vous a plu ?",o:[
+  ["Buonissimo, complimenti allo chef!","Délicieux, compliments au chef !",1],
+  ["Non lo so.","Je ne sais pas.",0,"Dis plutôt si tu as aimé le repas !"],
+  ["Ciao, amico!","Salut, l'ami !",0,"Trop familier, et ce n'est pas la question."]]},
+ {npc:"Desiderate un dolce o un caffè?",nfr:"Vous désirez un dessert ou un café ?",o:[
+  ["No, grazie. Il conto, per favore.","Non, merci. L'addition, s'il vous plaît.",1],
+  ["Sì, il treno.","Oui, le train.",0,"« Dolce » = dessert. Rien à voir avec le train !"],
+  ["Mi chiamo Paolo.","Je m'appelle Paolo.",0,"Il te propose un dessert ou un café."]]}]},
+{id:"hotel",ic:"🏨",it:"In albergo",fr:"À l'hôtel",who:"Receptionist",desc:"Fais ton check-in à la réception.",
+ tip:"« Grazie mille » (littéralement « mille mercis ») est la façon la plus courante de dire « merci beaucoup ».",
+ steps:[
+ {npc:"Buongiorno, benvenuto! Posso aiutarla?",nfr:"Bonjour, bienvenue ! Puis-je vous aider ?",o:[
+  ["Buongiorno, ho una prenotazione a nome Martin.","Bonjour, j'ai une réservation au nom de Martin.",1],
+  ["Un gelato al cioccolato.","Une glace au chocolat.",0,"Tu es à la réception d'un hôtel, pas chez le glacier !"],
+  ["Arrivederci!","Au revoir !",0,"Tu viens d'arriver !"]]},
+ {npc:"Perfetto. Un documento, per favore.",nfr:"Parfait. Une pièce d'identité, s'il vous plaît.",o:[
+  ["Ecco il mio passaporto.","Voici mon passeport.",1],
+  ["Ecco mio fratello.","Voici mon frère.",0,"On te demande un document d'identité, pas un membre de ta famille 😄"],
+  ["Non ho fame.","Je n'ai pas faim.",0,"« Documento » = pièce d'identité."]]},
+ {npc:"Ecco la chiave. La camera è al terzo piano.",nfr:"Voici la clé. La chambre est au troisième étage.",o:[
+  ["Grazie. A che ora è la colazione?","Merci. À quelle heure est le petit-déjeuner ?",1],
+  ["Al banco, grazie.","Au comptoir, merci.",0,"Ça, c'est au café !"],
+  ["Sono le otto.","Il est huit heures.",0,"Personne ne t'a demandé l'heure."]]},
+ {npc:"La colazione è dalle sette alle dieci.",nfr:"Le petit-déjeuner est de sept heures à dix heures.",o:[
+  ["Perfetto, grazie mille!","Parfait, merci beaucoup !",1],
+  ["Quanto costa il treno?","Combien coûte le train ?",0,"Hors sujet."],
+  ["Due euro e cinquanta.","Deux euros cinquante.",0,"Il t'a donné des horaires, pas un prix."]]}]},
+{id:"stazione",ic:"🚉",it:"Alla stazione",fr:"À la gare",who:"Bigliettaio",desc:"Achète un billet de train pour Florence.",
+ tip:"N'oublie pas de valider (« convalidare ») ton billet de train régional avant de monter, sinon tu risques une amende !",
+ steps:[
+ {npc:"Buongiorno, mi dica.",nfr:"Bonjour, je vous écoute.",o:[
+  ["Un biglietto per Firenze, per favore.","Un billet pour Florence, s'il vous plaît.",1],
+  ["Una pizza margherita.","Une pizza margherita.",0,"Tu es au guichet de la gare 😄"],
+  ["Non lo so.","Je ne sais pas.",0,"Dis où tu veux aller !"]]},
+ {npc:"Solo andata o andata e ritorno?",nfr:"Aller simple ou aller-retour ?",o:[
+  ["Andata e ritorno, grazie.","Aller-retour, merci.",1],
+  ["A sinistra.","À gauche.",0,"« Andata » = aller, « ritorno » = retour."],
+  ["Ho ventidue anni.","J'ai vingt-deux ans.",0,"On ne te demande pas ton âge."]]},
+ {npc:"Sono trentacinque euro.",nfr:"Ça fait trente-cinq euros.",o:[
+  ["Posso pagare con la carta?","Je peux payer par carte ?",1],
+  ["Buonanotte.","Bonne nuit.",0,"Il est temps de payer, pas d'aller dormir !"],
+  ["Sono francese.","Je suis français.",0,"Il t'annonce le prix du billet."]]},
+ {npc:"Certo. Il treno parte dal binario quattro alle dieci e un quarto.",nfr:"Bien sûr. Le train part du quai quatre à dix heures et quart.",o:[
+  ["Binario quattro, grazie mille!","Quai quatre, merci beaucoup !",1],
+  ["Che ore sono?","Quelle heure est-il ?",0,"Il vient de te donner l'heure de départ !"],
+  ["Il binario è rosso?","Le quai est rouge ?",0,"Répète plutôt le numéro du quai pour être sûr."]]}]},
+{id:"strada",ic:"🗺️",it:"Chiedere la strada",fr:"Demander son chemin",who:"Passante",desc:"Trouve le chemin du Colisée à Rome.",
+ tip:"« Lei » est la forme de politesse en italien (comme notre « vous ») : on l'utilise avec les inconnus. D'où « Scusi » et non « Scusa ».",
+ steps:[
+ {ctx:"Tu es à Rome et tu cherches le Colisée. Aborde poliment un passant.",o:[
+  ["Scusi, dov'è il Colosseo?","Excusez-moi, où est le Colisée ?",1],
+  ["Ciao bello, cosa prendi?","Salut beau gosse, tu prends quoi ?",0,"Trop familier et hors sujet !"],
+  ["Il conto, per favore.","L'addition, s'il vous plaît.",0,"Tu cherches ton chemin, pas l'addition !"]]},
+ {npc:"È vicino! Vada dritto e poi giri a destra.",nfr:"C'est tout près ! Allez tout droit puis tournez à droite.",o:[
+  ["Dritto e poi a destra. È lontano a piedi?","Tout droit puis à droite. C'est loin à pied ?",1],
+  ["A sinistra, grazie.","À gauche, merci.",0,"Il a dit « a destra » (à droite), pas à gauche !"],
+  ["Sono di Parigi.","Je suis de Paris.",0,"Concentre-toi sur l'itinéraire."]]},
+ {npc:"No, sono cinque minuti a piedi.",nfr:"Non, c'est à cinq minutes à pied.",o:[
+  ["Grazie mille, molto gentile!","Merci beaucoup, très gentil !",1],
+  ["Cinque euro?","Cinq euros ?",0,"« Minuti » = minutes, pas euros !"],
+  ["Buonasera, piacere.","Bonsoir, enchanté.",0,"Ce n'est pas le moment des présentations, remercie-le !"]]},
+ {npc:"Prego, buona giornata!",nfr:"Je vous en prie, bonne journée !",o:[
+  ["Anche a lei, arrivederci!","À vous aussi, au revoir !",1],
+  ["Prego!","Je vous en prie !",0,"« Prego » répond à « grazie ». Ici, rends-lui son souhait !"],
+  ["Ho una prenotazione.","J'ai une réservation.",0,"Hors sujet."]]}]},
+{id:"mercato",ic:"🍅",it:"Al mercato",fr:"Au marché",who:"Fruttivendolo",desc:"Achète des fruits et légumes au marché.",
+ tip:"Au marché italien, on évite de toucher les fruits soi-même : on laisse le vendeur nous servir.",
+ steps:[
+ {npc:"Buongiorno! Cosa le do?",nfr:"Bonjour ! Qu'est-ce que je vous donne ?",o:[
+  ["Vorrei un chilo di pomodori, per favore.","Je voudrais un kilo de tomates, s'il vous plaît.",1],
+  ["Vorrei una camera.","Je voudrais une chambre.",0,"Tu es au marché, pas à l'hôtel !"],
+  ["Sono stanco.","Je suis fatigué.",0,"Il te demande ce que tu veux acheter."]]},
+ {npc:"Ecco qua. Altro?",nfr:"Voilà. Autre chose ?",o:[
+  ["Sì, anche delle mele. Quanto costano?","Oui, aussi des pommes. Combien elles coûtent ?",1],
+  ["Binario quattro.","Quai quatre.",0,"On n'est pas à la gare !"],
+  ["Buonanotte!","Bonne nuit !",0,"Ce n'est pas le moment de dormir 😄"]]},
+ {npc:"Due euro al chilo. Sono buonissime!",nfr:"Deux euros le kilo. Elles sont délicieuses !",o:[
+  ["Allora ne prendo mezzo chilo.","Alors j'en prends un demi-kilo.",1],
+  ["Sono buonissimo.","Je suis délicieux.",0,"Haha, c'est toi le délicieux ? Dis plutôt combien tu en veux."],
+  ["Non parlo spagnolo.","Je ne parle pas espagnol.",0,"Il parle italien, et tu l'as compris !"]]},
+ {npc:"In tutto sono quattro euro.",nfr:"En tout, ça fait quatre euros.",o:[
+  ["Ecco a lei. Buona giornata!","Voilà pour vous. Bonne journée !",1],
+  ["Un tavolo per due.","Une table pour deux.",0,"Ça, c'est au restaurant."],
+  ["Il pane è verde.","Le pain est vert.",0,"Euh… il faut payer !"]]}]},
+{id:"amici",ic:"🤝",it:"Fare conoscenza",fr:"Faire connaissance",who:"Giulia",desc:"Rencontre Giulia et présente-toi.",
+ tip:"Entre jeunes ou amis, on se tutoie (« tu ») ; avec un inconnu plus âgé, on vouvoie avec « Lei ».",
+ steps:[
+ {npc:"Ciao! Io sono Giulia. E tu, come ti chiami?",nfr:"Salut ! Moi, c'est Giulia. Et toi, comment tu t'appelles ?",o:[
+  ["Ciao Giulia! Mi chiamo Alex, piacere.","Salut Giulia ! Je m'appelle Alex, enchanté.",1],
+  ["Ho trent'anni.","J'ai trente ans.",0,"Elle te demande ton prénom (« come ti chiami? »)."],
+  ["Il conto, per favore.","L'addition, s'il vous plaît.",0,"Hors sujet !"]]},
+ {npc:"Piacere mio! Di dove sei?",nfr:"Enchantée ! D'où es-tu ?",o:[
+  ["Sono francese, di Lione. E tu?","Je suis français, de Lyon. Et toi ?",1],
+  ["Sono le tre.","Il est trois heures.",0,"« Di dove sei? » = d'où viens-tu ?"],
+  ["Dov'è il bagno?","Où sont les toilettes ?",0,"Pas très romantique 😄"]]},
+ {npc:"Io sono di Napoli. Che lavoro fai?",nfr:"Moi, je suis de Naples. Qu'est-ce que tu fais comme travail ?",o:[
+  ["Sono studente. Studio l'italiano!","Je suis étudiant. J'étudie l'italien !",1],
+  ["Vado a Napoli domani.","Je vais à Naples demain.",0,"Elle te demande ton métier (« lavoro »)."],
+  ["Sì, grazie.","Oui, merci.",0,"Ce n'est pas une question fermée."]]},
+ {npc:"Bravo! Parli già molto bene! Prendiamo un caffè insieme?",nfr:"Bravo ! Tu parles déjà très bien ! On prend un café ensemble ?",o:[
+  ["Volentieri! Andiamo!","Avec plaisir ! Allons-y !",1],
+  ["Arrivederci, signore.","Au revoir, monsieur.",0,"Giulia est une femme… et elle te propose un café !"],
+  ["Non capisco il treno.","Je ne comprends pas le train.",0,"Ça ne veut rien dire 😄"]]}]},
+{id:"negozio",ic:"👗",it:"Al negozio",fr:"Dans un magasin",who:"Commessa",desc:"Achète un t-shirt dans une boutique.",
+ tip:"En Italie, les soldes (« i saldi ») ont lieu en janvier et en juillet.",
+ steps:[
+ {npc:"Buongiorno! Posso aiutarla?",nfr:"Bonjour ! Je peux vous aider ?",o:[
+  ["Sì, cerco una maglietta blu.","Oui, je cherche un t-shirt bleu.",1],
+  ["Andata e ritorno.","Aller-retour.",0,"Ça, c'est à la gare."],
+  ["Sì, ho fame.","Oui, j'ai faim.",0,"Tu es dans un magasin de vêtements."]]},
+ {npc:"Che taglia porta?",nfr:"Quelle taille faites-vous ?",o:[
+  ["La M, per favore.","Du M, s'il vous plaît.",1],
+  ["Il blu.","Le bleu.",0,"Tu as déjà donné la couleur, on te demande la taille (« taglia »)."],
+  ["Porto la valigia.","Je porte la valise.",0,"Ici « portare » veut dire porter une taille."]]},
+ {npc:"Ecco. Il camerino è là in fondo.",nfr:"Voilà. La cabine d'essayage est là-bas, au fond.",o:[
+  ["Grazie, la provo subito.","Merci, je l'essaie tout de suite.",1],
+  ["Buon appetito!","Bon appétit !",0,"On ne mange pas un t-shirt 😄"],
+  ["Il camerino è giallo?","La cabine est jaune ?",0,"Va plutôt essayer le t-shirt !"]]},
+ {npc:"Allora? Le sta bene?",nfr:"Alors ? Il vous va bien ?",o:[
+  ["Sì, è perfetta! La prendo.","Oui, il est parfait ! Je le prends.",1],
+  ["Sto bene, grazie.","Je vais bien, merci.",0,"« Le sta bene? » = ça vous va bien ? (le vêtement), pas « comment allez-vous ? »."],
+  ["Due biglietti.","Deux billets.",0,"Hors sujet."]]}]}
+];
+
+const PRON=[
+["c + e / i","« tch »","ciao, cena","ciao. cena"],
+["ch","« k »","che, chiesa","che. chiesa"],
+["g + e / i","« dj »","gelato, giorno","gelato. giorno"],
+["gh","« g » dur","spaghetti, ghiaccio","spaghetti. ghiaccio"],
+["gli","« lli » mouillé","famiglia, figlio","famiglia. figlio"],
+["gn","« gn » de « montagne »","gnocchi, bagno","gnocchi. bagno"],
+["sc + e / i","« ch »","pesce, uscita","pesce. uscita"],
+["z","« dz » ou « ts »","zero, pizza","zero. pizza"],
+["u","toujours « ou »","luna, uno","luna. uno"],
+["e","« é » ou « è »","bene, caffè","bene. caffè"],
+["r","roulé, comme en espagnol","Roma, amore","Roma. amore"],
+["consonnes doubles","on appuie et on les tient","nonno ≠ nono, palla","nonno. nono. palla"]
+];
+const LEVELS=["Principiante","Turista","Viaggiatore","Esploratore","Chiacchierone","Quasi italiano","Maestro"];
+
+// ================== ÉTAT ==================
+const $=id=>document.getElementById(id);const app=$("app");
+let S={xp:0,best:{},stars:{},streak:0,last:"",showTr:true};
+try{S=Object.assign(S,JSON.parse(localStorage.getItem("italiano")||"{}"))}catch(e){}
+function save(){try{localStorage.setItem("italiano",JSON.stringify(S))}catch(e){}updPts()}
+(function(){const t=new Date().toDateString(),y=new Date(Date.now()-864e5).toDateString();if(S.last!==t){S.streak=S.last===y?(S.streak||0)+1:1;S.last=t;save()}})();
+function updPts(){$("pts").textContent="⭐ "+S.xp}
+function lvl(){const n=Math.min(Math.floor(S.xp/60),LEVELS.length-1);return{n,name:LEVELS[n],pct:n===LEVELS.length-1?100:(S.xp%60)/60*100}}
+function addXP(n){const b=lvl().n;S.xp+=n;save();const a=lvl().n;if(a>b)toast("🎉 Nouveau niveau : "+LEVELS[a]+" !")}
+function shuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+function items(key){const m=c=>c.w.map(w=>({it:w[0],fr:w[1]}));if(key==="all")return V.flatMap(m);return m(V.find(c=>c.id===key))}
+function keyName(k){return k==="all"?"Tout le vocabulaire":V.find(c=>c.id===k).name}
+
+// ================== NAVIGATION ==================
+const stack=[];let SID=0;
+function show(fn,a){SID++;fn(...a);window.scrollTo(0,0)}
+function go(fn,...a){stack.push([fn,a]);show(fn,a)}
+function replace(fn,...a){stack[stack.length-1]=[fn,a];show(fn,a)}
+function goBack(){if(stack.length>1){stack.pop();const t=stack[stack.length-1];show(t[0],t[1]);return true}return false}
+function setTitle(t){$("title").textContent=t;$("back").style.visibility=stack.length>1?"visible":"hidden"}
+function later(f,ms){const s=SID;setTimeout(()=>{if(s===SID)f()},ms)}
+
+// ================== SON ==================
+let SAY=[],warned=false,tT;
+function sb(t,cls){SAY.push(t);return `<button class="${cls||"spk"}" onclick="event.stopPropagation();speak(SAY[${SAY.length-1}])">🔊</button>`}
+function toast(m){const t=$("toast");t.textContent=m;t.classList.add("show");clearTimeout(tT);tT=setTimeout(()=>t.classList.remove("show"),3500)}
+function speak(t){
+  t=String(t).replace(/\.\.\./g,"");
+  try{
+    if(window.Android){if(Android.speak(t))return}
+    else if(window.speechSynthesis){const u=new SpeechSynthesisUtterance(t);u.lang="it-IT";u.rate=.9;speechSynthesis.cancel();speechSynthesis.speak(u);return}
+  }catch(e){}
+  if(!warned){warned=true;toast("Voix italienne indisponible : Paramètres › Synthèse vocale › Moteur Google › installer « Italien ».")}
+}
+
+// ================== ACCUEIL ==================
+function home(){
+  setTitle("Impara l'italiano");SAY=[];const l=lvl();
+  const done=Object.keys(S.stars).length;
+  app.innerHTML=`<div class="hero"><h2>Ciao! 👋</h2><p>L'italien facilement, en jouant</p></div>
+  <div class="card lvl"><div class="badge">${l.n+1}</div><div style="flex:1"><b>${l.name}</b> <small style="color:var(--mut)">· niveau ${l.n+1}</small><div class="bar"><i style="width:${l.pct}%"></i></div><small style="color:var(--mut)">⭐ ${S.xp} XP · 🔥 ${S.streak} jour${S.streak>1?"s":""} d'affilée</small></div></div>
+  <div class="grid">
+    <button class="tile wide" onclick="go(scenes)"><div class="ic">🎭</div><div><b style="margin:0">Mises en situation</b><small>Dialogue au café, au restaurant, à la gare… · ${done} / ${SC.length} réussies</small></div></button>
+    <button class="tile" onclick="go(games)"><div class="ic">🎮</div><b>Jeux</b><small>6 jeux pour apprendre</small></button>
+    <button class="tile" onclick="go(lessons)"><div class="ic">📚</div><b>Leçons</b><small>${V.reduce((n,c)=>n+c.w.length,0)} mots en ${V.length} thèmes</small></button>
+    <button class="tile" onclick="go(pron)"><div class="ic">🗣️</div><b>Prononciation</b><small>Les règles simples</small></button>
+    <button class="tile" onclick="go(quiz,'all')"><div class="ic">⚡</div><b>Défi rapide</b><small>10 questions au hasard</small></button>
+  </div>
+  <p class="tip" style="margin-top:16px">💡 Touche 🔊 pour écouter. Chaque bonne réponse te fait gagner de l'XP pour monter de niveau !</p>`;
+}
+
+// ================== LEÇONS ==================
+function lessons(){
+  setTitle("📚 Leçons");SAY=[];
+  app.innerHTML=`<div class="grid">${V.map(c=>`<button class="tile" onclick="go(theme,'${c.id}')"><div class="ic">${c.ic}</div><b>${c.name}</b><small>${c.w.length} mots${S.best["q_"+c.id]!=null?" · quiz "+S.best["q_"+c.id]+"%":""}</small></button>`).join("")}</div>`;
+}
+function theme(id){
+  const c=V.find(x=>x.id===id);setTitle(c.ic+" "+c.name);SAY=[];
+  app.innerHTML=`<div class="row" style="margin-top:-10px"><button class="btn sec" onclick="go(flash,'${id}')">🃏 Flashcards</button><button class="btn" onclick="go(quiz,'${id}')">🎯 Quiz</button></div>
+  <div class="card" style="margin-top:14px">${c.w.map(w=>`<div class="word"><div class="it">${w[0]}<small>${w[1]}</small></div>${sb(w[0])}</div>`).join("")}</div>`;
+}
+function pron(){
+  setTitle("🗣️ Prononciation");SAY=[];
+  app.innerHTML=`<div class="card"><p style="margin:0">Bonne nouvelle : l'italien <b>se lit presque comme il s'écrit</b> ! Retiens ces quelques règles et tu sauras tout lire. L'accent tonique tombe le plus souvent sur l'<b>avant-dernière syllabe</b> : pi-<b>ZZA</b>, ra-<b>GAZ</b>-zo.</p></div>
+  <div class="card pr">${PRON.map(p=>`<div class="word"><div style="flex:1"><b>${p[0]}</b> → ${p[1]}<br><span style="color:var(--g2);font-weight:600">${p[2]}</span></div>${sb(p[3])}</div>`).join("")}</div>`;
+}
+
+// ================== FLASHCARDS ==================
+let F;
+function flash(key){F={key,deck:shuffle(items(key)),i:0,flip:false,known:0,n:items(key).length};setTitle("🃏 "+keyName(key));rF()}
+function rF(){
+  SAY=[];const c=F.deck[F.i];
+  if(!c){app.innerHTML=`<div class="card center"><div style="font-size:56px">🎉</div><h3>Paquet terminé !</h3><p>Connues du premier coup : <b>${F.known} / ${F.n}</b></p><button class="btn" onclick="flash(F.key)">Recommencer</button><button class="btn sec" onclick="goBack()">Retour</button></div>`;return}
+  const left=F.deck.length-F.i;
+  app.innerHTML=`<p class="prog">Reste ${left} carte${left>1?"s":""}</p>
+  <div class="card flash" onclick="F.flip=!F.flip;rF()">${F.flip?`<div class="big">${c.it}</div><div style="font-size:24px;margin-top:12px">${c.fr}</div>`:`<div class="big">${c.it}</div><p style="color:var(--mut)">Que veut dire ce mot ?<br>Touche la carte pour vérifier</p>`}</div>
+  <button class="btn sec" onclick="speak(F.deck[F.i].it)">🔊 Écouter</button>
+  ${F.flip?`<div class="row"><button class="btn red" onclick="fA(0)">À revoir ↺</button><button class="btn" onclick="fA(1)">Je savais ✓</button></div>`:""}`;
+  if(!F.flip)later(()=>speak(c.it),250);
+}
+function fA(ok){const c=F.deck[F.i];if(ok){if(!c.miss){F.known++;addXP(1)}}else{c.miss=1;F.deck.push(c)}F.i++;F.flip=false;rF()}
+
+// ================== QUIZ ==================
+let Q;
+function quiz(key){
+  const pool=items(key);
+  Q={key,qs:shuffle(pool).slice(0,10).map(it=>({it,dir:Math.random()<.5?0:1,opts:shuffle([it,...shuffle(pool.filter(o=>o.fr!==it.fr&&o.it!==it.it)).slice(0,3)])})),i:0,score:0,lock:false};
+  setTitle(key==="all"?"⚡ Défi rapide":"🎯 Quiz · "+keyName(key));rQ();
+}
+function endCard(score,n,bestKey,again,extra){
+  const pct=Math.round(score*100/n),prev=S.best[bestKey],rec=prev==null||pct>prev;if(rec){S.best[bestKey]=pct;save()}
+  app.innerHTML=`<div class="card center"><div style="font-size:60px">${pct>=80?"🏆":pct>=50?"👍":"💪"}</div><h3 style="font-size:22px">${score} / ${n}</h3>
+  <p>${pct>=80?"Bravissimo ! 🇮🇹":pct>=50?"Bene ! Continue comme ça.":"Coraggio ! Encore un essai et ça va venir."}</p>${rec&&prev!=null?"<p>🎉 Nouveau record !</p>":""}${extra||""}
+  <button class="btn" onclick="${again}">Rejouer</button><button class="btn sec" onclick="goBack()">Retour</button></div>`;
+}
+function rQ(){
+  SAY=[];const q=Q.qs[Q.i],n=Q.qs.length;
+  if(!q)return endCard(Q.score,n,"q_"+Q.key,"quiz(Q.key)");
+  app.innerHTML=`<div class="pbar"><i style="width:${Q.i/n*100}%"></i></div><p class="prog">Question ${Q.i+1} / ${n} · Score ${Q.score}</p>
+  <div class="card center">${q.dir===0?`<div class="q">${q.it.it}</div>${sb(q.it.it)}<p class="prog">Que signifie ce mot ?</p>`:`<div class="q" style="color:var(--txt)">${q.it.fr}</div><p class="prog">Comment dit-on en italien ?</p>`}</div>
+  ${q.opts.map((o,k)=>`<button class="opt" onclick="qA(${k})">${q.dir?o.it:o.fr}</button>`).join("")}`;
+}
+function qA(k){
+  if(Q.lock)return;Q.lock=true;const q=Q.qs[Q.i],g=q.opts.indexOf(q.it),b=document.querySelectorAll(".opt");
+  b[g].classList.add("ok");if(k===g){Q.score++;addXP(1)}else b[k].classList.add("ko");
+  speak(q.it.it);later(()=>{Q.i++;Q.lock=false;rQ()},k===g?1000:2000);
+}
+
+// ================== MISES EN SITUATION ==================
+function scenes(){
+  setTitle("🎭 Mises en situation");SAY=[];
+  app.innerHTML=`<p class="tip">Tu es en Italie ! Lis (ou écoute) ce que dit ton interlocuteur et choisis la bonne réponse. Réussis sans faute pour gagner ★★★.</p>
+  ${SC.map(s=>{const st=S.stars[s.id]||0;return `<button class="tile wide" style="width:100%;margin-top:12px" onclick="go(scene,'${s.id}')"><div class="ic">${s.ic}</div><div style="flex:1"><b style="margin:0">${s.it} <span style="font-weight:400;color:var(--mut)">· ${s.fr}</span></b><small>${s.desc}</small><div style="color:var(--gold);font-size:18px">${"★".repeat(st)}<span style="color:#d1d5db">${"★".repeat(3-st)}</span></div></div></button>`}).join("")}`;
+}
+let C;
+function scene(id){const sc=SC.find(s=>s.id===id);C={sc,i:0,err:0,log:[],lock:false};setTitle(sc.ic+" "+sc.it);enterStep()}
+function enterStep(){
+  const st=C.sc.steps[C.i];if(!st)return sceneEnd();
+  if(st.ctx)C.log.push({t:"narr",fr:st.ctx});
+  if(st.npc)C.log.push({t:"npc",it:st.npc,fr:st.nfr});
+  C.opts=shuffle(st.o.map(o=>({it:o[0],fr:o[1],ok:o[2],fb:o[3]})));C.bad=[];C.fb="";C.lock=false;
+  rSc();if(st.npc)later(()=>speak(st.npc),350);
+}
+function rSc(){
+  SAY=[];const sc=C.sc,n=sc.steps.length;
+  const chat=C.log.map(m=>m.t==="narr"?`<div class="msg narr">🎬 ${m.fr}</div>`
+    :m.t==="npc"?`<div class="msg npc"><span class="who">${sc.who}</span>${m.it}${sb(m.it,"spk2")}${S.showTr?`<small>${m.fr}</small>`:""}</div>`
+    :`<div class="msg me"><span class="who">Toi</span>${m.it}${S.showTr?`<small>${m.fr}</small>`:""}</div>`).join("");
+  app.innerHTML=`<div class="pbar"><i style="width:${C.i/n*100}%"></i></div>
+  <div class="toggle"><button onclick="S.showTr=!S.showTr;save();rSc()">${S.showTr?"🙈 Masquer":"👁 Afficher"} la traduction</button></div>
+  <div class="chat">${chat}</div>
+  ${C.lock?"":`<p class="prog">Que réponds-tu ?</p>${C.opts.map((o,k)=>`<button class="opt left ${C.bad.includes(k)?"ko":""}" onclick="pick(${k})">${o.it}${S.showTr||C.bad.includes(k)?`<small>${o.fr}</small>`:""}</button>`).join("")}${C.fb?`<div class="fb">❌ ${C.fb}</div>`:""}`}`;
+  window.scrollTo(0,document.body.scrollHeight);
+}
+function pick(k){
+  if(C.lock)return;const o=C.opts[k];
+  if(o.ok){C.lock=true;C.log.push({t:"me",it:o.it,fr:o.fr});addXP(C.bad.length?1:3);rSc();speak(o.it);later(()=>{C.i++;enterStep()},1800)}
+  else{if(!C.bad.includes(k)){C.bad.push(k);C.err++}C.fb=o.fb||"Pas tout à fait… relis bien la question.";rSc()}
+}
+function sceneEnd(){
+  const sc=C.sc,stars=C.err===0?3:C.err<=2?2:1;
+  if(stars>(S.stars[sc.id]||0)){S.stars[sc.id]=stars;save()}
+  if(C.err===0)addXP(5);
+  SAY=[];
+  const key=sc.steps.map(st=>st.o.find(o=>o[2]));
+  app.innerHTML=`<div class="card center"><div style="font-size:50px">${sc.ic}</div><h3 style="font-size:22px;margin:6px 0">Situation réussie !</h3>
+  <div class="stars">${"★".repeat(stars)}<span style="color:#d1d5db">${"★".repeat(3-stars)}</span></div>
+  <p>${C.err===0?"Perfetto ! Aucune erreur (+5 XP bonus)":C.err+" erreur"+(C.err>1?"s":"")+" — rejoue pour viser ★★★"}</p></div>
+  <div class="tip">💡 <b>Le savais-tu ?</b> ${sc.tip}</div>
+  <h3>📝 Phrases à retenir</h3><div class="card">${key.map(o=>`<div class="word"><div class="it" style="font-size:16px">${o[0]}<small>${o[1]}</small></div>${sb(o[0])}</div>`).join("")}</div>
+  <div class="row"><button class="btn sec" onclick="scene(C.sc.id)">↺ Rejouer</button><button class="btn" onclick="nextScene()">Suivante ›</button></div>`;
+  window.scrollTo(0,0);
+}
+function nextScene(){const i=SC.indexOf(C.sc);if(i<SC.length-1)replace(scene,SC[i+1].id);else goBack()}
+
+// ================== JEUX ==================
+function games(){
+  setTitle("🎮 Jeux");SAY=[];const b=S.best;
+  const G=[
+    ["quizAll","⚡","Quiz express","Choisis la bonne traduction",b.q_all!=null?"Record "+b.q_all+"%":""],
+    ["memory","🧠","Memory","Retrouve les paires",b.memory?"Record "+b.memory+" coups":""],
+    ["listen","🎧","Écoute & choisis","Entraîne ton oreille",b.listen!=null?"Record "+b.listen+"%":""],
+    ["scramble","🧩","Phrases en désordre","Remets les mots dans l'ordre",b.scramble!=null?"Record "+b.scramble+"%":""],
+    ["anagram","🔤","Lettres mélangées","Écris le mot",b.anagram!=null?"Record "+b.anagram+"%":""],
+    ["vf","⏱️","Vrai ou faux ?","60 secondes chrono",b.vf!=null?"Record "+b.vf+" pts":""]];
+  app.innerHTML=`<div class="grid">${G.map(g=>`<button class="tile" onclick="go(${g[0]==="quizAll"?"quiz,'all'":g[0]})"><div class="ic">${g[1]}</div><b>${g[2]}</b><small>${g[3]}</small>${g[4]?`<small style="display:block;color:var(--g2);font-weight:600;margin-top:4px">🏅 ${g[4]}</small>`:""}</button>`).join("")}</div>`;
+}
+
+// --- Memory ---
+let M;
+function memory(){
+  const seen=new Set(),ws=[];
+  for(const w of shuffle(items("all").filter(w=>w.it.length<=13&&w.fr.length<=15))){if(seen.has(w.fr))continue;seen.add(w.fr);ws.push(w);if(ws.length===6)break}
+  M={cards:shuffle(ws.flatMap((w,k)=>[{k,tx:w.it,it:1},{k,tx:w.fr,it:0}])),open:[],found:[],moves:0,lock:false};
+  setTitle("🧠 Memory");rM();
+}
+function rM(){
+  const end=M.found.length===6;
+  app.innerHTML=`<p class="prog">Retrouve les paires italien ↔ français · Coups : <b>${M.moves}</b></p>
+  <div class="mem">${M.cards.map((c,i)=>{const f=M.found.includes(c.k),up=f||M.open.includes(i);return `<button class="mc ${up?"up":""} ${f?"found":""} ${c.it?"it":""}" onclick="mC(${i})">${up?c.tx:"🇮🇹"}</button>`}).join("")}</div>
+  ${end?`<div class="card center" style="margin-top:14px"><div style="font-size:50px">🎉</div><h3>Bravo ! Terminé en ${M.moves} coups</h3><button class="btn" onclick="memory()">Rejouer</button><button class="btn sec" onclick="goBack()">Retour</button></div>`:""}`;
+}
+function mC(i){
+  const c=M.cards[i];if(M.lock||M.open.includes(i)||M.found.includes(c.k))return;
+  if(c.it)speak(c.tx);M.open.push(i);
+  if(M.open.length===2){
+    M.moves++;const[a,b]=M.open;
+    if(M.cards[a].k===M.cards[b].k){M.found.push(c.k);M.open=[];addXP(2);if(M.found.length===6&&(!S.best.memory||M.moves<S.best.memory)){S.best.memory=M.moves;save()}}
+    else{M.lock=true;later(()=>{M.open=[];M.lock=false;rM()},1100)}
+  }
+  rM();
+}
+
+// --- Écoute & choisis ---
+let E;
+function listen(){
+  const pool=items("all");
+  E={qs:shuffle(pool).slice(0,10).map(it=>({it,opts:shuffle([it,...shuffle(pool.filter(o=>o.it!==it.it&&o.fr!==it.fr)).slice(0,3)])})),i:0,score:0,lock:false};
+  setTitle("🎧 Écoute & choisis");rE();
+}
+function rE(){
+  const q=E.qs[E.i],n=E.qs.length;
+  if(!q)return endCard(E.score,n,"listen","listen()");
+  app.innerHTML=`<div class="pbar"><i style="width:${E.i/n*100}%"></i></div><p class="prog">Question ${E.i+1} / ${n} · Score ${E.score}</p>
+  <div class="card center"><button class="btn" style="font-size:22px;padding:22px" onclick="speak(E.qs[E.i].it.it)">🔊 Écouter</button><p class="prog">Quel mot entends-tu ?</p></div>
+  ${q.opts.map((o,k)=>`<button class="opt" onclick="eA(${k})">${o.it}<small class="tr" style="display:none">${o.fr}</small></button>`).join("")}`;
+  later(()=>speak(q.it.it),400);
+}
+function eA(k){
+  if(E.lock)return;E.lock=true;const q=E.qs[E.i],g=q.opts.indexOf(q.it),b=document.querySelectorAll(".opt");
+  document.querySelectorAll(".tr").forEach(e=>e.style.display="block");
+  b[g].classList.add("ok");if(k===g){E.score++;addXP(1)}else{b[k].classList.add("ko");speak(q.it.it)}
+  later(()=>{E.i++;E.lock=false;rE()},k===g?1300:2300);
+}
+
+// --- Phrases en désordre ---
+let P;
+function scramble(){P={qs:shuffle(SENT).slice(0,6),i:0,score:0};setTitle("🧩 Phrases en désordre");newP()}
+function newP(){
+  const s=P.qs[P.i];if(!s)return endCard(P.score,P.qs.length,"scramble","scramble()");
+  P.words=s[0].split(" ");let p;do{p=shuffle(P.words.map((w,k)=>({w,k,used:false})))}while(p.map(x=>x.w).join(" ")===s[0]);
+  P.pool=p;P.ans=[];P.state=0;rP();
+}
+function rP(){
+  const s=P.qs[P.i];
+  app.innerHTML=`<div class="pbar"><i style="width:${P.i/P.qs.length*100}%"></i></div><p class="prog">Phrase ${P.i+1} / ${P.qs.length} · Score ${P.score}</p>
+  <div class="card center"><p class="prog" style="margin-top:0">Traduis en italien :</p><div style="font-size:21px;font-weight:700">${s[1]}</div></div>
+  <div class="chips ans ${P.state===1?"ok":P.state===2?"ko":""}">${P.ans.map((j,x)=>`<button class="chip" onclick="pD(${x})">${P.pool[j].w}</button>`).join("")}</div>
+  <div class="chips" style="justify-content:center;margin-top:10px">${P.pool.map((c,j)=>`<button class="chip ${c.used?"used":""}" onclick="pT(${j})">${c.w}</button>`).join("")}</div>
+  ${P.state===2?`<div class="fb">Bonne réponse : <b>${s[0]}</b></div>`:""}
+  ${P.state?`<button class="btn" onclick="P.i++;newP()">Suivante ›</button>`:`<button class="btn sec" onclick="P.ans=[];P.pool.forEach(c=>c.used=false);rP()">Effacer</button>`}`;
+}
+function pT(j){if(P.state||P.pool[j].used)return;P.pool[j].used=true;P.ans.push(j);
+  if(P.ans.length===P.words.length){const ok=P.ans.map(j=>P.pool[j].w).join(" ")===P.qs[P.i][0];P.state=ok?1:2;if(ok){P.score++;addXP(2)}speak(P.qs[P.i][0])}rP()}
+function pD(x){if(P.state)return;P.pool[P.ans[x]].used=false;P.ans.splice(x,1);rP()}
+
+// --- Lettres mélangées ---
+let A;
+function anagram(){
+  const pool=items("all").filter(w=>/^[a-zàèéìòù]{4,9}$/i.test(w.it));
+  A={qs:shuffle(pool).slice(0,8),i:0,score:0};setTitle("🔤 Lettres mélangées");newA();
+}
+function newA(){
+  const w=A.qs[A.i];if(!w)return endCard(A.score,A.qs.length,"anagram","anagram()");
+  const word=w.it.toLowerCase();let l;do{l=shuffle(word.split(""))}while(l.join("")===word);
+  A.word=word;A.letters=l.map(c=>({c,used:false}));A.typed=[];A.state=0;A.hint=false;rA();
+}
+function rA(){
+  const w=A.qs[A.i];
+  app.innerHTML=`<div class="pbar"><i style="width:${A.i/A.qs.length*100}%"></i></div><p class="prog">Mot ${A.i+1} / ${A.qs.length} · Score ${A.score}</p>
+  <div class="card center"><p class="prog" style="margin-top:0">Écris en italien :</p><div style="font-size:26px;font-weight:700">${w.fr}</div>
+  <div class="slots ${A.state===1?"ok":A.state===2?"ko":""}">${A.word.split("").map((c,x)=>`<div class="slot">${A.state===2?c:A.typed[x]!=null?A.letters[A.typed[x]].c:(A.hint&&x===0?`<span style="opacity:.35">${c}</span>`:"")}</div>`).join("")}</div></div>
+  <div class="letters">${A.letters.map((o,j)=>`<button class="letter ${o.used?"used":""}" onclick="aT(${j})">${o.c}</button>`).join("")}</div>
+  ${A.state?`<button class="btn" onclick="A.i++;newA()">Suivant ›</button>`:`<div class="row"><button class="btn sec" onclick="aDel()">⌫ Effacer</button><button class="btn sec" onclick="A.hint=true;rA()">💡 Indice</button></div>`}`;
+}
+function aT(j){if(A.state||A.letters[j].used)return;A.letters[j].used=true;A.typed.push(j);
+  if(A.typed.length===A.word.length){const ok=A.typed.map(j=>A.letters[j].c).join("")===A.word;A.state=ok?1:2;if(ok){A.score++;addXP(2)}speak(A.qs[A.i].it)}rA()}
+function aDel(){if(A.state||!A.typed.length)return;A.letters[A.typed.pop()].used=false;rA()}
+
+// --- Vrai ou faux chrono ---
+let T;
+function vf(){
+  setTitle("⏱️ Vrai ou faux ?");T=null;
+  app.innerHTML=`<div class="card center"><div style="font-size:56px">⏱️</div><h3>60 secondes chrono !</h3><p>Un mot italien et une traduction s'affichent :<br>est-ce <b>vrai</b> ou <b>faux</b> ? Réponds le plus vite possible.</p>${S.best.vf!=null?`<p>🏅 Ton record : <b>${S.best.vf}</b> points</p>`:""}<button class="btn" onclick="vfStart()">C'est parti !</button></div>`;
+}
+function vfStart(){
+  T={score:0,time:60,errs:0};newT();const s=SID;
+  T.timer=setInterval(()=>{if(s!==SID){clearInterval(T.timer);return}T.time--;
+    if(T.time<=0){clearInterval(T.timer);const rec=S.best.vf==null||T.score>S.best.vf;if(rec){S.best.vf=T.score;save()}
+      app.innerHTML=`<div class="card center"><div style="font-size:60px">${T.score>=15?"🏆":"⏱️"}</div><h3 style="font-size:24px">${T.score} points</h3><p>${T.errs} erreur${T.errs>1?"s":""}</p>${rec?"<p>🎉 Nouveau record !</p>":""}<button class="btn" onclick="vfStart()">Rejouer</button><button class="btn sec" onclick="goBack()">Retour</button></div>`;return}
+    const t=document.getElementById("tm");if(t)t.textContent=T.time;},1000);
+}
+function newT(){const pool=items("all"),w=pool[Math.floor(Math.random()*pool.length)];T.truth=Math.random()<.5;let f=w.fr;if(!T.truth){let o;do{o=pool[Math.floor(Math.random()*pool.length)]}while(o.fr===w.fr);f=o.fr}T.w=w;T.f=f;rT()}
+function rT(cls){
+  app.innerHTML=`<div class="timer" id="tm">${T.time}</div><p class="prog">Score : <b>${T.score}</b></p>
+  <div class="card vf ${cls||""}">${T.w.it}<small>= ${T.f} ?</small></div>
+  <div class="row"><button class="btn red" style="padding:22px;font-size:20px" onclick="vfA(false)">✗ Faux</button><button class="btn" style="padding:22px;font-size:20px" onclick="vfA(true)">✓ Vrai</button></div>`;
+}
+function vfA(b){if(!T||T.time<=0)return;const ok=b===T.truth;if(ok){T.score++;addXP(1)}else T.errs++;const c=ok?"flashok":"flashko";newT();rT(c)}
+
+updPts();go(home);
+</script>
+</body>
+</html>
