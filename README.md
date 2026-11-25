@@ -1,12 +1,13 @@
 # 🇮🇹 Dolci d'Italia
 
-Application Android de desserts typiques **italiens et siciliens** : 42 recettes + 8 recettes de base, faciles à suivre.
+Application Android de pâtisserie **italienne et sicilienne**, sucrée et salée : 42 desserts, 12 recettes salées + 9 recettes de base, faciles à suivre.
 
 ## 📲 Installer
 Va dans **[Releases](../../releases)** (version « Dolci d'Italia »), télécharge le fichier `.apk` sur ton téléphone et ouvre-le.
 (Autorise « Installer des applications inconnues » si Android le demande.)
 
 ## ✨ Fonctions
+- **Nouveau : pâtisserie salée** — focaccia génoise, sfincione, piadina, grissini, taralli, pizzette, calzone, panelle, arancine, tarte ricotta-épinards, tarte courgettes-jambon cru, torta pasqualina (+ pâte levée de base)
 - 17 spécialités siciliennes (cannoli, cassata, granita, brioche col tuppo, frutta martorana, iris, cuccìa…) et 25 classiques italiens (tiramisù, pastiera, babà, panna cotta, cantucci, zeppole…)
 - **Mode pas à pas** : grand texte, écran toujours allumé, lecture à voix haute, commandes vocales (« suivant », « répète », « minuteur »)
 - **Minuteurs** multiples + minuteur dans l'horloge du téléphone

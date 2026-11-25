@@ -107,10 +107,11 @@ const FILTRES = [
   {id:"sans-gluten", l:"🌾 Sans gluten"}, {id:"sans-oeuf", l:"🥚 Sans œufs"},
   {id:"chocolat", l:"🍫 Chocolat"}, {id:"ricotta", l:"🧀 Ricotta"}, {id:"amande", l:"🌰 Amandes"},
   {id:"frit", l:"🔥 Frits"}, {id:"noel", l:"🎄 Noël"}, {id:"paques", l:"🐣 Pâques"}, {id:"carnaval", l:"🎭 Carnaval"}, {id:"ete", l:"☀️ Été"},
+  {id:"sale", l:"🧀 Salé", f:r=>r.zone==="sale"}, {id:"sucre", l:"🍰 Sucré", f:r=>r.zone==="sicile"||r.zone==="italie"},
   {id:"fav", l:"♥ Favoris", f:r=>S.favs.includes(r.id)}
 ];
 function passeFiltre(r, id){ const F=FILTRES.find(x=>x.id===id); if(!F) return true; return F.f ? F.f(r) : (r.tags||[]).includes(id); }
-const CATS = [["Frit","🔥"],["Cuillère","🥄"],["Gâteau","🎂"],["Tarte","🥧"],["Biscuits","🍪"],["Glacé","🍨"],["Pâtisserie","🧁"],["Viennoiserie","🍞"],["Confiserie","🍬"],["Sans cuisson","❄️"],["Bases","📘"]];
+const CATS = [["Frit","🔥"],["Cuillère","🥄"],["Gâteau","🎂"],["Tarte","🥧"],["Biscuits","🍪"],["Glacé","🍨"],["Pâtisserie","🧁"],["Viennoiserie","🍞"],["Confiserie","🍬"],["Sans cuisson","❄️"],["Focaccia & pain","🫓"],["Apéritif","🫒"],["Street food","🍙"],["Tourte salée","🥬"],["Bases","📘"]];
 function search(q){ const w=norm(q).split(" ").filter(x=>x.length>1).map(x=>x.replace(/s$/,"")); return RECETTES.filter(r=>w.every(x=>r._s.includes(x))); }
 
 /* ============ Vues ============ */
@@ -127,6 +128,7 @@ VIEWS.home = () => {
   ${favs.length?`<h2>♥ Mes favoris</h2><div class="hscroll">${favs.map(mini).join("")}</div>`:""}
   <h2>🍋 Spécialités siciliennes</h2><div class="hscroll">${RECETTES.filter(r=>r.zone==="sicile").map(mini).join("")}</div>
   <h2>🇮🇹 Grands classiques italiens</h2><div class="hscroll">${RECETTES.filter(r=>r.zone==="italie").map(mini).join("")}</div>
+  <h2>🧀 Pâtisserie salée</h2><div class="hscroll">${RECETTES.filter(r=>r.zone==="sale").map(mini).join("")}</div>
   <h2>😊 Faciles pour débuter</h2><div class="hscroll">${VRAIES.filter(r=>r.d===1).map(mini).join("")}</div>
   <h2>Par catégorie</h2>
   <div class="cats">${CATS.map(([c,e])=>`<button class="cat" onclick="go('list',{cat:'${c}'})"><span>${e}</span>${c}</button>`).join("")}</div>
@@ -137,7 +139,7 @@ VIEWS.home = () => {
 
 VIEWS.list = p => {
   p.zone = p.zone||"all"; p.sort = p.sort||"nom";
-  const z = [["all","Toutes"],["sicile","🍋 Sicile"],["italie","🇮🇹 Italie"],["base","📘 Bases"]];
+  const z = [["all","Toutes"],["sicile","🍋 Sicile"],["italie","🇮🇹 Italie"],["sale","🧀 Salé"],["base","📘 Bases"]];
   $("#view").innerHTML = `
   <div class="search"><input id="lq" type="search" placeholder="🔍 Nom, ingrédient, région…" value="${esc(p.q||"")}"></div>
   <div class="chips" id="cz">${z.map(([k,l])=>`<button class="chip ${p.zone===k?"on":""}" data-z="${k}">${l}</button>`).join("")}</div>
@@ -410,13 +412,16 @@ function answer(raw){
   }
 
   // 8. Idées / filtres
-  const TAGW = [["facile","facile"],["simple","facile"],["debutant","facile"],["rapide","rapide"],["vite","rapide"],["presse","rapide"],["sans cuisson","sans-cuisson"],["sans four","sans-cuisson"],["sans gluten","sans-gluten"],["coeliaque","sans-gluten"],["sans oeuf","sans-oeuf"],["vegan","sans-oeuf"],["chocolat","chocolat"],["noel","noel"],["paques","paques"],["carnaval","carnaval"],["ete","ete"],["chaud","ete"],["frais","ete"],["frit","frit"],["beignet","frit"],["ricotta","ricotta"],["amande","amande"],["enfant","facile"],["fete","fete"]];
+  const TAGW = [["facile","facile"],["simple","facile"],["debutant","facile"],["rapide","rapide"],["vite","rapide"],["presse","rapide"],["sans cuisson","sans-cuisson"],["sans four","sans-cuisson"],["sans gluten","sans-gluten"],["coeliaque","sans-gluten"],["sans oeuf","sans-oeuf"],["vegan","sans-oeuf"],["chocolat","chocolat"],["noel","noel"],["paques","paques"],["carnaval","carnaval"],["ete","ete"],["chaud","ete"],["frais","ete"],["frit","frit"],["beignet","frit"],["ricotta","ricotta"],["amande","amande"],["sale","sale"],["apero","sale"],["aperitif","sale"],["focaccia","sale"],["tourte","sale"],["enfant","facile"],["fete","fete"]];
   const tg = TAGW.find(([w])=>n.includes(" "+w));
   if(tg && (/recette|dessert|idee|propose|conseill|sugger|quoi faire|que faire|cherche|liste|envie|gateau|faire|veux|donne/.test(n) || n.trim().split(" ").length<=3)){
     let list=VRAIES.filter(r=>passeFiltre(r,tg[1]));
     if(/sicil/.test(n)) list=list.filter(r=>r.zone==="sicile");
+    if(/ sale| salee| sales| apero| aperitif/.test(n)) list=list.filter(r=>r.zone==="sale");
+    else if(/dessert|sucre|gateau|douceur/.test(n)) list=list.filter(r=>r.zone!=="sale");
     if(list.length) return out(`Voici des idées${tg[1]!=="facile"?"":" faciles"} pour toi (${list.length}) 👇`, rLinks(list).concat(list.length>8?[link("Voir toutes ➜",`go('list',{tag:'${tg[1]}'})`)]:[]), "Voici des idées : "+list.slice(0,5).map(r=>r.n).join(", "));
   }
+  if(/\bsale|\bsalee|\bsales|aperitif|apero/.test(n) && /recette|idee|propose|liste|patisserie|quoi|faire|envie/.test(n)){ const list=RECETTES.filter(r=>r.zone==="sale"); return out(`🧀 Les ${list.length} recettes salées de l'appli :`, rLinks(list).concat([link("Voir toutes ➜","go('list',{zone:'sale'})")])); }
   if(/sicil/.test(n) && /recette|dessert|idee|propose|typique|specialite|liste/.test(n)){ const list=RECETTES.filter(r=>r.zone==="sicile"); return out(`🍋 Les ${list.length} spécialités siciliennes de l'appli :`, rLinks(list).concat([link("Voir toutes ➜","go('list',{zone:'sicile'})")])); }
   if(/hasard|surprise|aleatoire|n importe|inspire|quoi faire|que faire aujourd|je sais pas quoi/.test(n) && !/avec/.test(n)){ const r=VRAIES[Math.floor(Math.random()*VRAIES.length)]; return out(`🎲 Que dirais-tu de <b>${esc(r.n)}</b> ? ${esc(r.desc)}`, [link(r.e+" Voir la recette",`openR('${r.id}')`), link("🎲 Une autre","assistSend('surprise moi')")]); }
 
@@ -515,9 +520,9 @@ VIEWS.aide = p => {
   let h = `<div class="chips tabs2">${T.map(([k,l])=>`<button class="chip ${p.s===k?"on":""}" onclick="stack[stack.length-1].p.s='${k}';render()">${l}</button>`).join("")}</div>`;
   const acc = (t, body, open) => `<div class="acc"><button onclick="const d=this.nextElementSibling;d.hidden=!d.hidden;this.querySelector('i').textContent=d.hidden?'＋':'−'">${t}<i>${open?"−":"＋"}</i></button><div ${open?"":"hidden"}>${body}</div></div>`;
   if(p.s==="app"){
-    h += `<div class="box tip"><b>Bienvenue dans Dolci d'Italia ! 🇮🇹</b><br>${VRAIES.length} desserts typiques d'Italie et de Sicile + ${RECETTES.length-VRAIES.length} recettes de base, avec pas-à-pas, minuteurs, vidéos et un assistant.</div>`;
+    h += `<div class="box tip"><b>Bienvenue dans Dolci d'Italia ! 🇮🇹</b><br>${VRAIES.filter(r=>r.zone!=="sale").length} desserts typiques d'Italie et de Sicile, ${VRAIES.filter(r=>r.zone==="sale").length} recettes salées (focaccia, arancine, tourtes…) + ${RECETTES.length-VRAIES.length} recettes de base, avec pas-à-pas, minuteurs, vidéos et un assistant.</div>`;
     h += AIDE_APP.map((a,i)=>acc(esc(a.t), `<p>${esc(a.r)}</p>`, i===0)).join("");
-    h += `<h3>Pour bien commencer</h3><ol class="steps"><li>Choisis une recette marquée <b>★☆☆ Facile</b> (tiramisù, panna cotta, granita).</li><li>Lis-la entière une fois, et regarde une vidéo.</li><li>Ajoute les ingrédients aux courses.</li><li>Sors tous les ingrédients avant de commencer, pesés.</li><li>Lance le <b>mode pas à pas</b> et laisse-toi guider.</li></ol>`;
+    h += `<h3>Pour bien commencer</h3><ol class="steps"><li>Choisis une recette marquée <b>★☆☆ Facile</b> (tiramisù, panna cotta, granita, ou en salé : focaccia, piadina).</li><li>Lis-la entière une fois, et regarde une vidéo.</li><li>Ajoute les ingrédients aux courses.</li><li>Sors tous les ingrédients avant de commencer, pesés.</li><li>Lance le <b>mode pas à pas</b> et laisse-toi guider.</li></ol>`;
   } else if(p.s==="tech"){
     h += TECHNIQUES.map(t=>acc(t.e+" "+esc(t.t), `<ol>${t.s.map(x=>`<li>${esc(x)}</li>`).join("")}</ol>`)).join("");
     h += `<h3>🎬 Vidéos de techniques</h3><div class="chips" style="flex-wrap:wrap">${[["Monter les blancs","come montare albumi a neve ferma"],["Crème pâtissière","crema pasticcera ricetta"],["Pâte sablée","pasta frolla perfetta"],["Égoutter la ricotta","come scolare la ricotta"],["Frire sans risque","come friggere dolci temperatura olio"],["Poche à douille","come usare sac a poche"]].map(([l,q])=>`<button class="chip" onclick="yt('${q}')">🎬 ${l}</button>`).join("")}</div>`;
