@@ -10,8 +10,8 @@ android {
         applicationId "com.dolci.italiani"
         minSdk 26
         targetSdk 34
-        versionCode (System.getenv("VERSION_CODE") ?: "1").toInteger()
-        versionName "1.0." + (System.getenv("VERSION_CODE") ?: "1")
+        versionCode = (System.getenv("VERSION_CODE") ?: "1").toInteger()
+        versionName = "1.0." + (System.getenv("VERSION_CODE") ?: "1")
     }
 
     def ksPath = System.getenv("KEYSTORE_FILE")
