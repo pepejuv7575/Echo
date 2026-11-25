@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Dolci d'Italia</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header id="top">
+  <button id="btnBack" class="icon-btn" aria-label="Retour" hidden>‹</button>
+  <h1 id="title">Dolci d'Italia</h1>
+  <button id="btnTimers" class="icon-btn" aria-label="Minuteurs">⏱️</button>
+</header>
+<main id="view"></main>
+<div id="timerBar" hidden></div>
+<nav id="tabs">
+  <button data-tab="home" class="on"><span>🏠</span>Accueil</button>
+  <button data-tab="list"><span>📖</span>Recettes</button>
+  <button data-tab="assistant"><span>🤖</span>Assistant</button>
+  <button data-tab="courses"><span>🛒</span>Courses</button>
+  <button data-tab="aide"><span>❓</span>Aide</button>
+</nav>
+<div id="sheet" hidden><div class="sheet-card"><div id="sheetBody"></div></div></div>
+<div id="toast" hidden></div>
+<script src="data.js"></script>
+<script src="aide.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

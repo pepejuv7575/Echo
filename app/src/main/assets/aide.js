@@ -1,0 +1,98 @@
+// Base de connaissances de l'assistant et des pages d'aide
+
+const SUBSTITUTIONS = [
+{k:["ricotta brebis","ricotta"], t:"Ricotta de brebis", r:"Prends de la ricotta de vache bien égouttée (12 h) et ajoute 50 g de mascarpone pour 500 g. Tu peux aussi faire ta ricotta maison (voir recettes de base)."},
+{k:["mascarpone"], t:"Mascarpone", r:"Pour 250 g : 200 g de ricotta bien égouttée + 50 ml de crème liquide entière, mixées. Ou du Saint-Moret / cream cheese + un peu de crème (goût différent)."},
+{k:["saindoux","strutto"], t:"Saindoux (strutto)", r:"Remplace par le même poids de beurre, ou 80 % de son poids en huile neutre (ex. 100 g saindoux = 80 g d'huile)."},
+{k:["manitoba","farine de force","farine forte","gruau"], t:"Farine Manitoba / de force", r:"Farine de gruau T45, farine « spéciale brioche » ou farine T55 + 1 c.à.c. de gluten pour 500 g. Pour les pâtes levées, c'est important : elle retient mieux les gaz."},
+{k:["farine 00","00"], t:"Farine 00", r:"La farine italienne 00 correspond à la T45 française (fine). La farine 0 ≈ T55."},
+{k:["semola","semoule rimacinata","semoule fine"], t:"Semola rimacinata", r:"Semoule de blé dur extra-fine (rayon italien). Sinon, moitié semoule fine + moitié farine T55."},
+{k:["savoiardi","biscuits a la cuillere","boudoirs"], t:"Savoiardi", r:"Biscuits à la cuillère ou boudoirs. En dépannage : tranches de génoise ou de quatre-quarts un peu sèches."},
+{k:["marsala"], t:"Marsala", r:"Porto, Madère, Xérès doux, ou vin blanc doux + 1 c.à.s. de cognac. Sans alcool : jus de raisin + quelques gouttes de vanille."},
+{k:["alchermes","alkermes"], t:"Alchermes", r:"100 ml de sirop de grenadine + 50 ml de rhum + 1 pincée de cannelle + 1 clou de girofle + un zeste d'orange, chauffés puis refroidis. Sans alcool : sirop de framboise dilué."},
+{k:["rhum","rum","alcool","sans alcool","enfant"], t:"Alcool (rhum, liqueurs)", r:"Remplace par du jus d'orange, du café, du lait ou un sirop d'arôme (rhum sans alcool). Dans les sirops d'imbibage, ajoute le zeste d'agrumes pour compenser l'arôme."},
+{k:["grano cotto","ble cuit","grano"], t:"Grano cotto (blé cuit)", r:"Ebly cuit longuement dans du lait, ou riz rond (riz au lait). Le grano cotto se trouve en bocal dans les épiceries italiennes, surtout avant Pâques."},
+{k:["amidon","maizena","fecule"], t:"Amidon / Maïzena / fécule", r:"Amidon de maïs (Maïzena), fécule de pomme de terre ou amidon de riz sont interchangeables à poids égal. En dépannage : farine, mais il en faut 2 fois plus."},
+{k:["levure fraiche","levure seche","levure de boulanger","lievito"], t:"Levure de boulanger", r:"Levure fraîche ÷ 3 = levure sèche active (10 g fraîche = 3-4 g sèche). La levure sèche instantanée se mélange directement à la farine."},
+{k:["levure chimique","baking"], t:"Levure chimique", r:"1 sachet = 11 g environ. Remplace par 1/2 c.à.c. de bicarbonate + 1 c.à.c. de jus de citron pour 250 g de farine."},
+{k:["oeuf cru","oeufs crus","enceinte","pasteurise"], t:"Œufs crus (tiramisù, etc.)", r:"Utilise des œufs pasteurisés (en brique), ou cuis les jaunes au bain-marie jusqu'à 75-80 °C (pâte à bombe), ou remplace les blancs par une meringue italienne ou de la crème fouettée."},
+{k:["oeuf","oeufs","sans oeuf","vegan"], t:"Sans œufs", r:"Pour lier une pâte : 1 œuf = 50 g de compote de pomme ou 1 c.à.s. de graines de lin moulues + 3 c.à.s. d'eau. Pour une mousse : aquafaba (jus de pois chiches) montée en neige. Desserts déjà sans œufs : granite, biancomangiare, gelo di mellone, castagnaccio, salame di cioccolato."},
+{k:["gelatine","agar"], t:"Gélatine ↔ agar-agar", r:"1 g d'agar-agar ≈ 8 g de gélatine. L'agar doit BOUILLIR 1-2 minutes pour agir. Pour une panna cotta de 500 ml : 2 g d'agar."},
+{k:["amande amere","extrait amande"], t:"Amandes amères", r:"Quelques gouttes d'extrait d'amande amère, ou 1 c.à.s. d'amaretto, ou 2 amaretti écrasés."},
+{k:["fruits confits","ecorce","orange confite","zuccata","cedrat"], t:"Fruits confits", r:"Zeste d'orange frais finement râpé + 1 c.à.s. de confiture d'orange amère, ou abricots secs en dés. Écorces confites maison : écorces blanchies 3 fois puis cuites 1 h dans un sirop (poids égal sucre/eau)."},
+{k:["poudre d amande","farine d amande","amande en poudre"], t:"Poudre d'amande", r:"Mixe des amandes mondées avec 1 c.à.s. de sucre (pour éviter qu'elles rendent leur huile) par petites impulsions."},
+{k:["sucre glace"], t:"Sucre glace", r:"Mixe du sucre semoule finement avec 1 c.à.c. de Maïzena pour 100 g."},
+{k:["beurre"], t:"Beurre", r:"Margarine à poids égal, ou huile neutre à 80 % du poids (pâtes sablées plus friables). Pour les gâteaux : huile d'olive douce à 80 %."},
+{k:["creme liquide","panna"], t:"Crème liquide", r:"Pour monter, il faut au moins 30 % de matière grasse. En cuisson : lait entier + 20 g de beurre pour 100 ml."},
+{k:["pistache","pate de pistache"], t:"Pâte de pistache", r:"Mixe longuement des pistaches non salées avec une goutte d'huile neutre. Pour la couleur, 1 goutte de colorant vert."},
+{k:["eau de jasmin","jasmin","fleur d oranger"], t:"Eau de jasmin / fleur d'oranger", r:"L'eau de fleur d'oranger remplace l'eau de jasmin ; vanille ou zeste de citron en dernier recours."},
+{k:["chapelure"], t:"Chapelure", r:"Biscottes mixées, pain sec râpé, ou panko."},
+{k:["torrone","nougat"], t:"Torrone (nougat)", r:"Nougat de Montélimar dur, ou pralin, ou amandes caramélisées concassées."},
+{k:["amaretti"], t:"Amaretti", r:"Biscuits amaretti du commerce, ou macarons secs aux amandes, ou spéculoos (goût différent)."},
+{k:["lait d amande"], t:"Lait d'amande", r:"Lait d'amande du commerce non sucré, ou maison : 200 g d'amandes mixées avec 1 l d'eau, filtrées. En dépannage : lait entier + quelques gouttes d'extrait d'amande."},
+{k:["sans gluten","gluten","coeliaque"], t:"Sans gluten", r:"Naturellement sans gluten : paste di mandorla, torta caprese, ricciarelli, amaretti, granite, panna cotta, biancomangiare, gelo di mellone, castagnaccio, semifreddo. Pour les autres : mélange farine de riz + fécule (70/30) + 1 c.à.c. de gomme xanthane pour 300 g."}
+];
+
+const PROBLEMES = [
+{k:["creme","grumeau","grumeaux","patissiere"], q:"Ma crème pâtissière a des grumeaux", r:"Passe-la tout de suite au mixeur plongeant ou au tamis. La prochaine fois : verse le lait chaud en filet sur les jaunes en fouettant, et fouette sans arrêt pendant la cuisson."},
+{k:["creme","liquide","patissiere","epaissit","pas"], q:"Ma crème pâtissière reste liquide", r:"Elle doit bouillir ! L'amidon n'épaissit qu'après ébullition : laisse bouillir 1 minute en fouettant. Si elle redevient liquide en refroidissant, c'est qu'elle n'a pas assez cuit."},
+{k:["tiramisu","liquide","creme","mascarpone","tourne","coule"], q:"La crème du tiramisù est liquide", r:"Causes : mascarpone pas assez froid, trop fouetté (il tourne), ou blancs mal montés. Sauvetage : ajoute 100 ml de crème liquide très froide montée en chantilly, et laisse au réfrigérateur une nuit."},
+{k:["blanc","blancs","neige","monte","montent","pas"], q:"Mes blancs ne montent pas en neige", r:"Le bol doit être parfaitement propre et sec, sans aucune trace de jaune ni de gras. Ajoute une pincée de sel ou quelques gouttes de citron. Commence lentement puis accélère."},
+{k:["pate","leve","levee","monte","pas","levure"], q:"Ma pâte ne lève pas", r:"La levure est morte (liquide trop chaud au-dessus de 40 °C) ou la pièce est trop froide. Mets la pâte dans le four éteint avec la lumière allumée et un bol d'eau chaude. Si rien après 1 heure, la levure est périmée."},
+{k:["pate","sablee","casse","friable","dechire"], q:"Ma pâte sablée se casse quand je l'étale", r:"Elle est trop froide : laisse-la 5-10 minutes à température ambiante. Étale-la entre deux feuilles de papier cuisson. Les fissures se réparent en appuyant avec un petit morceau de pâte."},
+{k:["pate","colle","collante"], q:"La pâte colle partout", r:"Mets-la au frais 30 minutes. Étale-la entre deux feuilles de papier cuisson plutôt que d'ajouter beaucoup de farine (qui la durcit)."},
+{k:["friture","huile","temperature","thermometre","frire"], q:"Comment savoir si l'huile est à la bonne température ?", r:"Idéalement avec un thermomètre (170-180 °C pour la plupart des fritures). Sans thermomètre : plonge le manche d'une cuillère en bois, de petites bulles doivent se former autour. Ou un petit morceau de pâte doit remonter tout de suite en grésillant."},
+{k:["friture","gras","grasse","huileux"], q:"Mes beignets sont gras", r:"L'huile n'est pas assez chaude, ou tu en as mis trop à la fois (la température chute). Frite par petites quantités et laisse remonter la température entre deux fournées."},
+{k:["friture","cru","brule","dedans","dehors"], q:"Brûlé dehors, cru dedans", r:"L'huile est trop chaude. Pour les pâtes levées (bomboloni, iris), reste à 160-165 °C. Laisse le beignet plus longtemps à feu plus doux."},
+{k:["cannoli","coque","molle","ramolli"], q:"Les coques de cannoli sont molles", r:"Garnis les cannoli au dernier moment seulement ! L'humidité de la ricotta ramollit la coque en 1-2 heures. Astuce : badigeonne l'intérieur des coques de chocolat fondu, ça fait une barrière."},
+{k:["ricotta","liquide","eau","egoutter"], q:"Ma crème de ricotta est trop liquide", r:"La ricotta doit être égouttée 12 heures au frais dans une passoire fine. Pour sauver une crème : ajoute 50 g de mascarpone ou remets-la à égoutter dans un linge 2 heures."},
+{k:["gateau","genoise","retombe","plat","affaisse"], q:"Mon gâteau retombe à la sortie du four", r:"Four ouvert trop tôt, gâteau pas assez cuit, ou blancs/œufs trop fouettés puis cassés. Vérifie la cuisson avec une pique avant de sortir, et laisse 5 minutes dans le four éteint porte entrouverte."},
+{k:["gateau","sec"], q:"Mon gâteau est sec", r:"Trop cuit : chaque four est différent, vérifie 5-10 minutes avant la fin. Rattrapage : imbibe-le d'un sirop (100 ml d'eau + 80 g de sucre + zeste)."},
+{k:["chocolat","fondu","grumeleux","granuleux","serre","tourne"], q:"Mon chocolat a « tourné » (granuleux)", r:"Une goutte d'eau ou une chaleur trop forte. Ajoute 1 c.à.s. de crème chaude ou d'huile neutre et fouette. Fais toujours fondre le chocolat au bain-marie doux, sans que l'eau bouille."},
+{k:["caramel","cristallise","dur","sable"], q:"Mon caramel a cristallisé", r:"Ne remue jamais un caramel à sec : fais plutôt tourner la casserole. Une goutte de jus de citron ou de glucose au départ évite la cristallisation."},
+{k:["zabaione","sabayon","omelette","cuit","grumeaux"], q:"Mon zabaione fait des grumeaux d'œuf cuit", r:"Le bain-marie est trop chaud. L'eau doit à peine frémir et le bol ne doit pas toucher l'eau. Retire du feu de temps en temps en continuant de fouetter."},
+{k:["granita","dur","bloc","glace"], q:"Ma granita est un bloc de glace", r:"Laisse-la 10 minutes à température ambiante, gratte à la fourchette ou mixe-la brièvement. Pour l'éviter : gratte toutes les 30 minutes."},
+{k:["panna","cotta","prend","pas","liquide"], q:"Ma panna cotta ne prend pas", r:"Pas assez de gélatine ou gélatine pas complètement fondue. Il faut 7-8 g de gélatine pour 500 ml de crème et au moins 4 heures de froid."},
+{k:["choux","pate","liquide","trop"], q:"Ma pâte à choux est trop liquide", r:"Trop d'œufs. Prépare une petite pâte (50 ml d'eau, 20 g de beurre, 30 g de farine) sans œufs et mélange-la à la première."},
+{k:["brioche","dense","lourde","compacte"], q:"Ma brioche est dense", r:"Pâte pas assez pétrie (elle doit être élastique, faire une fine membrane quand on l'étire), beurre ajouté trop tôt, ou levée trop courte."},
+{k:["four","chaleur tournante","ventile","statique"], q:"Chaleur tournante ou statique ?", r:"Les recettes de l'app sont données en chaleur statique (traditionnelle). En chaleur tournante, baisse de 10 à 20 °C. Pour génoises et choux, préfère le statique."},
+{k:["altitude","moule","taille","plus grand","plus petit"], q:"Je n'ai pas la bonne taille de moule", r:"Un moule de 20 cm = 70 % d'un moule de 24 cm ; un moule de 28 cm = 136 %. Utilise le réglage des portions pour adapter les quantités, et ajuste le temps de cuisson (plus épais = plus long)."}
+];
+
+const TECHNIQUES = [
+{t:"Égoutter la ricotta", e:"🧀", s:["Pose une passoire fine (ou tapissée d'un linge) sur un bol.","Mets la ricotta dedans, couvre de film.","Laisse au réfrigérateur 12 heures. Tu peux poser une petite assiette dessus pour presser.","Jette le petit-lait qui s'est écoulé."]},
+{t:"Monter des blancs en neige", e:"🥚", s:["Bol propre et sec, blancs à température ambiante.","Ajoute une pincée de sel.","Fouette à vitesse lente puis augmente progressivement.","Ajoute le sucre en pluie quand ils sont mousseux.","Ils sont fermes quand ils forment un bec qui ne retombe pas et que le bol peut être retourné."]},
+{t:"Incorporer sans casser", e:"🥄", s:["Utilise une maryse (spatule souple).","Ajoute d'abord 1/3 des blancs pour détendre le mélange.","Puis le reste en soulevant de bas en haut et en tournant le bol.","Arrête dès que c'est homogène."]},
+{t:"Le bain-marie", e:"♨️", s:["Une casserole avec 3-4 cm d'eau qui frémit doucement.","Un bol (inox ou verre) posé dessus qui ne touche pas l'eau.","La vapeur chauffe doucement : idéal pour chocolat, zabaione, pâte à bombe."]},
+{t:"Sabler une pâte", e:"🧈", s:["Beurre froid coupé en petits dés.","Frotte farine et beurre entre tes paumes ou du bout des doigts.","Tu obtiens un sable fin sans morceaux de beurre.","Ajoute les œufs et rassemble vite, sans pétrir."]},
+{t:"Frire en sécurité", e:"🔥", s:["Utilise une casserole haute, remplie au maximum à moitié.","Huile d'arachide ou de tournesol (supporte bien la chaleur).","Contrôle la température (170-180 °C) avec un thermomètre.","Frite par petites quantités.","N'éloigne jamais : en cas de feu, couvre avec un couvercle, JAMAIS d'eau.","Éloigne les enfants de la casserole."]},
+{t:"Film au contact", e:"🎞️", s:["Pose le film alimentaire directement sur la surface de la crème encore chaude.","Il évite la formation d'une peau et la condensation."]},
+{t:"Utiliser une poche à douille", e:"🍦", s:["Mets la douille, tourne la poche juste au-dessus pour la fermer.","Pose la poche dans un grand verre, replie les bords dessus et remplis aux 2/3.","Tourne le haut pour chasser l'air.","Une main presse en haut, l'autre guide la douille.","Sans poche : un sac de congélation avec un coin coupé."]},
+{t:"Cuire un sirop au thermomètre", e:"🌡️", s:["110 °C : nappé (sirop épais).","115-118 °C : petit boulé (pâte d'amande, fondant).","118-121 °C : gros boulé (meringue italienne, pâte à bombe).","Sans thermomètre : une goutte dans l'eau froide forme une boule souple (petit boulé) ou ferme (gros boulé)."]},
+{t:"Tester la cuisson d'un gâteau", e:"🍰", s:["Plante une pique en bois ou une lame au centre.","Elle doit ressortir sèche (génoise) ou légèrement humide (caprese, gâteaux fondants).","Le gâteau se détache des bords du moule."]},
+{t:"Pétrir une pâte levée", e:"👐", s:["Pétris en poussant la pâte avec la paume puis en la repliant.","Au robot : crochet, vitesse moyenne.","Test de la membrane : un petit morceau étiré doit devenir fin et translucide sans se déchirer.","Le beurre s'ajoute à la fin, quand la pâte est déjà élastique."]}
+];
+
+const GLOSSAIRE = [
+["Amarena","Griotte au sirop, utilisée pour les zeppole."],["Amido","Amidon (de maïs ou de riz)."],["Bagnare","Imbiber (avec un sirop)."],["Cannolo","Tube frit garni de ricotta (pluriel : cannoli)."],["Canditi","Fruits confits."],["Crema pasticcera","Crème pâtissière."],["Dolce","Dessert, doux (pluriel : dolci)."],["Farina 00","Farine très fine, ≈ T45."],["Frolla","Pâte sablée."],["Grano cotto","Blé cuit, pour la pastiera."],["Lievito di birra","Levure de boulanger."],["Lievito per dolci","Levure chimique."],["Manitoba","Farine de force, riche en gluten."],["Mascarpone","Fromage crème de Lombardie."],["Montare","Monter (blancs, crème)."],["Panna","Crème (liquide)."],["Pasta reale","Pâte d'amande."],["Q.b. (quanto basta)","Quantité suffisante, à ton goût."],["Ricotta di pecora","Ricotta de brebis."],["Savoiardi","Biscuits à la cuillère."],["Semola rimacinata","Semoule de blé dur extra-fine."],["Strutto","Saindoux."],["Tuppo","Chignon : la petite tête de la brioche."],["Zeste / scorza","Peau râpée des agrumes."],["Zuccata","Courge confite, typique de Sicile."]
+];
+
+// Conversions : grammes pour 1 tasse (cup US 240 ml), 1 c.à.s. (15 ml), 1 c.à.c. (5 ml)
+const DENSITES = {
+"farine":{cup:125,cas:8,cac:3},"sucre":{cup:200,cas:12,cac:4},"sucre glace":{cup:120,cas:8,cac:3},"beurre":{cup:225,cas:14,cac:5},
+"cacao":{cup:85,cas:6,cac:2},"poudre d amande":{cup:95,cas:6,cac:2},"amande":{cup:95,cas:6,cac:2},"miel":{cup:340,cas:21,cac:7},"lait":{cup:240,cas:15,cac:5},
+"eau":{cup:240,cas:15,cac:5},"creme":{cup:240,cas:15,cac:5},"huile":{cup:218,cas:14,cac:4.5},"maizena":{cup:120,cas:8,cac:3},"amidon":{cup:120,cas:8,cac:3},
+"ricotta":{cup:245,cas:15,cac:5},"mascarpone":{cup:230,cas:15,cac:5},"sel":{cup:290,cas:18,cac:6},"levure":{cup:0,cas:10,cac:3.5},"riz":{cup:190,cas:12,cac:4},"semoule":{cup:170,cas:11,cac:4}
+};
+
+const AIDE_APP = [
+{t:"Trouver une recette", r:"Depuis l'Accueil, tape un nom ou un ingrédient dans la recherche (ex. « ricotta », « amande »), ou touche un filtre : Sicile, Facile, Sans cuisson, Noël... L'onglet Recettes permet de trier et filtrer par région, catégorie et difficulté."},
+{t:"Adapter les quantités", r:"Dans une recette, utilise les boutons − et + à côté du nombre de portions : toutes les quantités sont recalculées automatiquement, et aussi quand tu ajoutes les ingrédients à ta liste de courses."},
+{t:"Le mode guidé (pas à pas)", r:"Touche « Cuisiner pas à pas » : une étape à la fois en grands caractères, l'écran reste allumé, et un bouton lance le minuteur de l'étape. Le bouton 🔊 lit l'étape à voix haute. Le bouton 🎤 te permet de dire « suivant », « précédent », « répète », « minuteur » ou « ingrédients » sans toucher l'écran avec tes mains pleines de farine."},
+{t:"Les minuteurs", r:"Tu peux lancer plusieurs minuteurs à la fois (un pour le four, un pour la levée...). Ils s'affichent en bas de l'écran. À la fin, le téléphone sonne et vibre. Le bouton « ⏰ Téléphone » crée aussi le minuteur dans l'horloge de ton téléphone, utile si tu quittes l'application."},
+{t:"Les vidéos", r:"Chaque recette a deux boutons vidéo : « Vidéos en italien » (souvent les plus authentiques, par des pâtissiers italiens) et « Vidéos en français ». Ils ouvrent YouTube sur les meilleures vidéos de cette recette. Une connexion internet est nécessaire."},
+{t:"L'assistant", r:"L'onglet Assistant répond à tes questions, même sans internet : remplacer un ingrédient (« par quoi remplacer le mascarpone »), convertir (« 1 tasse de farine en grammes »), sauver une recette ratée (« ma crème est liquide »), trouver une idée (« que faire avec de la ricotta »), lancer un minuteur (« minuteur 10 minutes »). Touche 🎤 pour parler. Depuis une recette, le bouton « Poser une question » donne le contexte à l'assistant."},
+{t:"La liste de courses", r:"Dans une recette, « Ajouter aux courses » ajoute tous les ingrédients avec les quantités adaptées aux portions. Coche au fur et à mesure au magasin. Tu peux ajouter un article à la main et partager la liste par SMS ou WhatsApp."},
+{t:"Favoris, notes et historique", r:"Le cœur ♥ ajoute la recette à tes favoris. En bas de chaque recette, écris tes notes personnelles (« moins de sucre la prochaine fois »). Le bouton « Je l'ai faite » garde un historique. Tout est enregistré sur ton téléphone."},
+{t:"Fonctionne sans internet", r:"Toutes les recettes, l'assistant, les minuteurs et l'aide fonctionnent sans connexion. Seules les vidéos YouTube ont besoin d'internet."}
+];

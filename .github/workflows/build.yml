@@ -1,0 +1,65 @@
+name: Compiler l'APK
+
+on:
+  push:
+    branches: [ dolci-italiani ]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Vérifier le JavaScript
+        run: |
+          for f in app/src/main/assets/*.js; do node --check "$f"; done
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.7'
+
+      - name: Préparer la clé de signature
+        env:
+          KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
+        run: |
+          if [ -n "$KEYSTORE_BASE64" ]; then
+            echo "$KEYSTORE_BASE64" | base64 -d > "$RUNNER_TEMP/dolci.jks"
+            echo "KEYSTORE_FILE=$RUNNER_TEMP/dolci.jks" >> "$GITHUB_ENV"
+          fi
+
+      - name: Compiler
+        env:
+          VERSION_CODE: ${{ github.run_number }}
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+        run: gradle assembleRelease --no-daemon --stacktrace
+
+      - name: Renommer l'APK
+        run: cp app/build/outputs/apk/release/app-release.apk DolciItalia-v1.0.${{ github.run_number }}.apk
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: DolciItalia-apk
+          path: DolciItalia-*.apk
+
+      - name: Publier la version
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: dolci-v1.0.${{ github.run_number }}
+          name: Dolci d'Italia v1.0.${{ github.run_number }}
+          body: |
+            📲 **Télécharge `DolciItalia-v1.0.${{ github.run_number }}.apk` ci-dessous et ouvre-le sur ton téléphone Android pour l'installer.**
+
+            Si Android bloque l'installation : autorise « Installer des applications inconnues » pour ton navigateur ou ton gestionnaire de fichiers.
+          files: DolciItalia-*.apk
+          make_latest: false
