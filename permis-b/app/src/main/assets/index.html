@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="fr"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>Permis B Belgique</title>
+<style>
+:root{--bg:#f3f5f9;--card:#fff;--tx:#1b2333;--mut:#6b7486;--pri:#1a5bb5;--ok:#16a34a;--ko:#dc2626;--warn:#f59e0b;--bd:#e3e7ef}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;font-family:system-ui,-apple-system,Roboto,Arial,sans-serif;background:var(--bg);color:var(--tx);font-size:16px}
+header{position:sticky;top:0;z-index:5;display:flex;align-items:center;gap:8px;background:var(--pri);color:#fff;padding:12px 12px;box-shadow:0 2px 8px #0002}
+header h1{font-size:18px;margin:0;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#bk{background:none;border:0;color:#fff;font-size:30px;line-height:20px;padding:0 6px;visibility:hidden}
+main{padding:14px;max-width:760px;margin:0 auto;padding-bottom:60px}
+.hero{background:linear-gradient(135deg,#1a5bb5,#3b82f6);color:#fff;border-radius:18px;padding:18px;margin-bottom:14px}
+.hero b{font-size:26px}.hero .small{color:#dbe7ff}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.tile{background:var(--card);border-radius:16px;padding:14px;box-shadow:0 1px 4px #0001;border:1px solid var(--bd);min-height:96px}
+.tile .i{font-size:28px}.tile .l{font-weight:700;margin-top:6px}.tile .s{font-size:12px;color:var(--mut);margin-top:2px}
+.card{background:var(--card);border-radius:14px;padding:14px;margin-bottom:12px;border:1px solid var(--bd)}
+.row{display:flex;align-items:center;gap:12px}
+.list .card{display:flex;align-items:center;gap:12px}
+.list .card .t{flex:1;font-weight:600}
+.small{font-size:13px;color:var(--mut)}
+.btn{display:block;width:100%;border:0;border-radius:12px;padding:14px;font-size:16px;font-weight:700;background:var(--pri);color:#fff;margin:8px 0;text-align:center}
+.btn.sec{background:#e8eefb;color:var(--pri)}.btn.ok{background:var(--ok)}.btn.ko{background:var(--ko)}
+.btn:disabled{opacity:.45}
+.ans{display:flex;gap:10px;align-items:flex-start;width:100%;text-align:left;background:#fff;border:2px solid var(--bd);border-radius:12px;padding:12px;margin:8px 0;font-size:16px;color:var(--tx)}
+.ans .k{flex:none;width:28px;height:28px;border-radius:8px;background:#eef2f9;display:flex;align-items:center;justify-content:center;font-weight:800}
+.ans.sel{border-color:var(--pri);background:#eef4ff}.ans.ok{border-color:var(--ok);background:#e9f9ef}.ans.ko{border-color:var(--ko);background:#fdecec}
+.qtxt{font-size:18px;font-weight:650;margin:10px 0}
+.bar{height:8px;background:#e3e7ef;border-radius:8px;overflow:hidden}.bar i{display:block;height:100%;background:var(--pri)}
+.expl{background:#fff8e6;border-left:4px solid var(--warn);padding:10px;border-radius:8px;margin-top:8px;font-size:15px}
+.grave{display:inline-block;background:var(--ko);color:#fff;font-size:11px;font-weight:800;padding:2px 7px;border-radius:6px;vertical-align:middle}
+.tip{background:#eaf2ff;border-left:4px solid var(--pri);padding:10px;border-radius:8px;margin:10px 0}
+.sign{display:inline-block;vertical-align:middle}
+.signbig{text-align:center;margin:6px 0}
+.sgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.sgrid .card{text-align:center;padding:10px;margin:0;font-size:12px}
+table{border-collapse:collapse;width:100%;font-size:14px;background:#fff}td,th{border:1px solid var(--bd);padding:6px;text-align:center}th{background:#eef2f9}
+h3{margin:18px 0 6px;color:var(--pri)}
+ul,ol{padding-left:20px}li{margin:4px 0}
+.big{font-size:42px;font-weight:900;text-align:center}
+.pill{display:inline-block;padding:4px 10px;border-radius:20px;font-weight:700;font-size:13px}
+.pill.ok{background:#e9f9ef;color:var(--ok)}.pill.ko{background:#fdecec;color:var(--ko)}
+.timer{font-weight:800;color:var(--pri)}.timer.low{color:var(--ko)}
+canvas{width:100%;border-radius:12px;background:#000;display:block;touch-action:manipulation}
+#dz{font-size:22px;padding:18px;background:var(--ko)}
+.sw{display:flex;justify-content:space-between;align-items:center}
+.corr{border-left:5px solid var(--ok)}.corr.bad{border-left-color:var(--ko)}
+</style></head>
+<body>
+<header><button id="bk" onclick="goBack()">‹</button><h1 id="ttl">Permis B Belgique</h1><button id="tts" onclick="toggleTTS()" style="background:none;border:0;color:#fff;font-size:20px">🔈</button></header>
+<main id="app"></main>
+<script src="data.js"></script>
+<script>
+"use strict";
+const $=s=>document.querySelector(s);
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+let ST={};try{ST=JSON.parse(localStorage.getItem("pbbe")||"{}")}catch(e){ST={}}
+ST.hist=ST.hist||[];ST.wrong=ST.wrong||{};ST.th=ST.th||{};ST.hp=ST.hp||[];ST.read=ST.read||{};
+function save(){try{localStorage.setItem("pbbe",JSON.stringify(ST))}catch(e){}}
+function shuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+QS.forEach((q,i)=>q.id=i);
+
+// ---------- navigation ----------
+const stack=[];let cleanup=null;
+function clean(){if(cleanup){try{cleanup()}catch(e){}cleanup=null}stopSpeak()}
+function go(fn,replace){clean();if(replace)stack.pop();stack.push(fn);fn()}
+function goBack(){if(stack.length>1){clean();stack.pop();stack[stack.length-1]();return true}return false}
+function goHome(){clean();stack.length=0;go(home)}
+function render(title,html){$("#ttl").textContent=title;$("#app").innerHTML=html.replace(/\{\{(\w+)\}\}/g,(m,c)=>signSVG(c,40));$("#bk").style.visibility=stack.length>1?"visible":"hidden";window.scrollTo(0,0)}
+
+// ---------- voix ----------
+function toggleTTS(){ST.tts=!ST.tts;save();$("#tts").textContent=ST.tts?"🔊":"🔈";if(!ST.tts)stopSpeak()}
+function speak(t){if(!ST.tts)return;try{if(window.Android&&Android.speak(t))return}catch(e){}try{const u=new SpeechSynthesisUtterance(t);u.lang="fr-BE";speechSynthesis.cancel();speechSynthesis.speak(u)}catch(e){}}
+function stopSpeak(){try{if(window.Android)Android.stop()}catch(e){}try{speechSynthesis.cancel()}catch(e){}}
+$("#tts").textContent=ST.tts?"🔊":"🔈";
+
+// ---------- panneaux ----------
+const SYM={
+curveL:'<path d="M62 94V52Q62 26 36 26" fill="none" stroke="currentColor" stroke-width="12"/><path d="M42 4L12 26L42 48Z"/>',
+narrow:'<path d="M28 96V62L40 40V4M72 96V62L60 40V4" fill="none" stroke="currentColor" stroke-width="10"/>',
+slip:'<rect x="30" y="4" width="40" height="44" rx="9"/><rect x="24" y="40" width="10" height="12"/><rect x="66" y="40" width="10" height="12"/><path d="M26 62q12 8 0 18q-12 9 0 18M74 62q12 8 0 18q-12 9 0 18" fill="none" stroke="currentColor" stroke-width="7"/>',
+lights:'<rect x="30" y="0" width="40" height="100" rx="8" fill="#222"/><circle cx="50" cy="18" r="11" fill="#e22"/><circle cx="50" cy="50" r="11" fill="#fb0"/><circle cx="50" cy="82" r="11" fill="#2b4"/>',
+ped:'<circle cx="54" cy="12" r="11"/><path d="M52 28L44 60L28 96M46 58L64 96M50 34L32 54M52 34L72 50" fill="none" stroke="currentColor" stroke-width="11" stroke-linecap="round"/>',
+kids:'<circle cx="34" cy="14" r="10"/><path d="M33 28L28 58L16 94M30 56L44 94M31 34L16 52M33 34L48 46" fill="none" stroke="currentColor" stroke-width="9" stroke-linecap="round"/><circle cx="72" cy="30" r="9"/><path d="M71 42L67 66L58 96M68 64L80 96M69 48L58 60M71 48L84 58" fill="none" stroke="currentColor" stroke-width="8" stroke-linecap="round"/>',
+works:'<circle cx="36" cy="12" r="10"/><path d="M36 26L44 58L30 96M44 58L58 96M38 34L70 50M74 24L84 92" fill="none" stroke="currentColor" stroke-width="9" stroke-linecap="round"/><path d="M58 98Q78 66 98 98Z"/>',
+b15:'<path d="M50 2V98" stroke="currentColor" stroke-width="20"/><path d="M14 50H86" stroke="currentColor" stroke-width="10"/>',
+b17:'<path d="M14 14L86 86M86 14L14 86" stroke="currentColor" stroke-width="13"/>',
+b19:'<path d="M34 96V30" stroke="#222" stroke-width="12"/><path d="M34 4L16 34H52Z" fill="#222"/><path d="M68 4V70" stroke="#d0021b" stroke-width="8"/><path d="M68 96L54 66H82Z" fill="#d0021b"/>',
+b21:'<path d="M66 96V30" stroke="#fff" stroke-width="13"/><path d="M66 4L46 36H86Z" fill="#fff"/><path d="M30 4V70" stroke="#d0021b" stroke-width="8"/><path d="M30 96L16 66H44Z" fill="#d0021b"/>',
+noleft:'<path d="M66 98V50H34" fill="none" stroke="#111" stroke-width="13"/><path d="M4 50L38 20V80Z" fill="#111"/><path d="M8 8L92 92" stroke="#d0021b" stroke-width="11"/>',
+uturn:'<path d="M68 98V40Q68 14 46 14Q26 14 26 40V58" fill="none" stroke="#111" stroke-width="12"/><path d="M6 54L26 90L46 54Z" fill="#111"/><path d="M8 8L92 92" stroke="#d0021b" stroke-width="11"/>',
+cars:'<rect x="4" y="22" width="40" height="60" rx="10" fill="#d0021b"/><rect x="56" y="22" width="40" height="60" rx="10" fill="#111"/><rect x="10" y="30" width="28" height="16" rx="3" fill="#fff"/><rect x="62" y="30" width="28" height="16" rx="3" fill="#fff"/>',
+up:'<path d="M50 98V32" stroke="currentColor" stroke-width="15"/><path d="M50 2L18 40H82Z"/>',
+round:'<g id="ra"><path d="M50 12A38 38 0 0 1 88 46" fill="none" stroke="currentColor" stroke-width="10"/><path d="M98 40L88 62L74 42Z"/></g><use href="#ra" transform="rotate(120 50 50)"/><use href="#ra" transform="rotate(240 50 50)"/>',
+bike:'<circle cx="22" cy="68" r="18" fill="none" stroke="currentColor" stroke-width="7"/><circle cx="78" cy="68" r="18" fill="none" stroke="currentColor" stroke-width="7"/><path d="M22 68L40 38H70L78 68M40 38L54 68H22M64 26H78M44 28H56" fill="none" stroke="currentColor" stroke-width="7"/>',
+highway:'<path d="M6 40H94M6 56H94" stroke="currentColor" stroke-width="9"/><path d="M24 56V98M76 56V98" stroke="currentColor" stroke-width="9"/><path d="M42 98L48 62M58 98L52 62" stroke="currentColor" stroke-width="4"/>',
+car:'<path d="M14 64L26 30H74L86 64V84H14Z"/><rect x="18" y="84" width="16" height="12"/><rect x="66" y="84" width="16" height="12"/><path d="M30 38H70L76 58H24Z" fill="#1a5bb5"/>',
+house:'<path d="M14 50L42 22L70 50V84H14Z"/><rect x="34" y="62" width="14" height="22" fill="#1a5bb5"/><circle cx="82" cy="54" r="7"/><path d="M82 62V84M74 70H90" stroke="currentColor" stroke-width="6"/>',
+dead:'<rect x="40" y="34" width="20" height="64" fill="#fff"/><rect x="12" y="8" width="76" height="26" fill="#d0021b"/>',
+pedtri:'<path d="M50 4L96 94H4Z" fill="#fff"/><g transform="translate(30,34) scale(.5)" fill="#111"><circle cx="54" cy="12" r="11"/><path d="M52 28L44 60L28 96M46 58L64 96M50 34L32 54M52 34L72 50" fill="none" stroke="#111" stroke-width="11" stroke-linecap="round"/></g>'
+};
+SYM.curveR='<g transform="translate(100 0) scale(-1 1)">'+SYM.curveL+'</g>';
+function signSVG(code,sz){
+ const s=SG[code];if(!s)return"";const sh=s[1],sy=s[2];let b="",post="",col="#111",tr="translate(16,16) scale(.68)",tx={x:50,y:64,f:40,c:"#111"};
+ switch(sh){
+ case"tri":b='<path d="M50 7L95 88H5Z" fill="#fff" stroke="#d0021b" stroke-width="8" stroke-linejoin="round"/>';tr="translate(29,39) scale(.42)";tx={x:50,y:80,f:44,c:"#111"};break;
+ case"b1":b='<path d="M5 12H95L50 92Z" fill="#fff" stroke="#d0021b" stroke-width="9" stroke-linejoin="round"/>';break;
+ case"stop":b='<path d="M30 3H70L97 30V70L70 97H30L3 70V30Z" fill="#d0021b" stroke="#fff" stroke-width="3"/><text x="50" y="60" font-size="27" font-weight="900" fill="#fff" text-anchor="middle" font-family="Arial">STOP</text>';break;
+ case"b9":case"b11":b='<rect x="19" y="19" width="62" height="62" transform="rotate(45 50 50)" fill="#fff" stroke="#444" stroke-width="2"/><rect x="31" y="31" width="38" height="38" transform="rotate(45 50 50)" fill="#f7c600"/>'+(sh=="b11"?'<path d="M20 80L80 20" stroke="#111" stroke-width="7"/>':"");break;
+ case"rr":b='<circle cx="50" cy="50" r="44" fill="#fff" stroke="#d0021b" stroke-width="10"/>';tr="translate(22,22) scale(.56)";tx={x:50,y:64,f:40,c:"#111"};break;
+ case"c1":b='<circle cx="50" cy="50" r="46" fill="#d0021b"/><rect x="15" y="40" width="70" height="20" fill="#fff"/>';break;
+ case"c45":b='<circle cx="50" cy="50" r="45" fill="#fff" stroke="#999" stroke-width="3"/>';tx={x:50,y:64,f:40,c:"#888"};post='<path d="M22 82L82 22M16 72L72 16M28 88L88 28" stroke="#555" stroke-width="3"/>';break;
+ case"rb":b='<circle cx="50" cy="50" r="46" fill="#1a5bb5"/>';col="#fff";tr="translate(20,20) scale(.6)";break;
+ case"e1":case"e3":b='<circle cx="50" cy="50" r="44" fill="#1a5bb5" stroke="#d0021b" stroke-width="10"/><path d="M20 20L80 80" stroke="#d0021b" stroke-width="10"/>'+(sh=="e3"?'<path d="M80 20L20 80" stroke="#d0021b" stroke-width="10"/>':"");break;
+ case"sq":b='<rect x="5" y="5" width="90" height="90" rx="8" fill="#1a5bb5"/>';col="#fff";tx={x:50,y:74,f:62,c:"#fff"};break;
+ case"f1":case"f3":b='<rect x="3" y="24" width="94" height="52" rx="4" fill="#fff" stroke="#111" stroke-width="4"/>';tx={x:50,y:57,f:20,c:"#111"};if(sh=="f3")post='<path d="M8 72L92 28" stroke="#d0021b" stroke-width="7"/>';break;
+ case"zone":b='<rect x="8" y="3" width="84" height="94" rx="6" fill="#fff" stroke="#111" stroke-width="3"/><circle cx="50" cy="40" r="28" fill="#fff" stroke="#d0021b" stroke-width="7"/><text x="50" y="50" font-size="28" font-weight="800" text-anchor="middle" font-family="Arial">30</text><text x="50" y="88" font-size="18" font-weight="800" text-anchor="middle" font-family="Arial">ZONE</text>';break;
+ }
+ let inner="";
+ if(sy&&sy.startsWith("t:"))inner='<text x="'+tx.x+'" y="'+tx.y+'" font-size="'+tx.f+'" font-weight="900" fill="'+tx.c+'" text-anchor="middle" font-family="Arial">'+esc(sy.slice(2))+'</text>';
+ else if(sy)inner='<g transform="'+tr+'" fill="'+col+'" style="color:'+col+'">'+SYM[sy]+'</g>';
+ return '<svg class="sign" width="'+sz+'" height="'+sz+'" viewBox="0 0 100 100">'+b+inner+post+'</svg>';
+}
+
+// ---------- accueil ----------
+function home(){
+ const ex=ST.hist.filter(h=>h.exam);const last=ex[ex.length-1];
+ const ok=ex.filter(h=>h.pass).length;
+ const nW=Object.keys(ST.wrong).length;
+ const tiles=[["📚","Cours","16 chapitres","cours"],["🚸","Panneaux","Catalogue + quiz","panneaux"],["✏️","Entraînement","Par thème, corrigé","themes"],["📝","Examen blanc","50 questions aléatoires","examMenu"],["🎬","Perception des risques","Situations vidéo aléatoires","hpMenu"],["❌","Mes erreurs",nW+" question(s) à revoir","erreurs"],["📊","Statistiques","Progression","stats"],["ℹ️","L'examen","Règles 2026","infos"]];
+ render("Permis B Belgique",`<div class="hero"><div class="small">Ton niveau</div><b>${last?last.score+"/50":"—"}</b> <span class="small">dernier examen blanc</span><div class="small" style="margin-top:6px">${ex.length} examen(s) • ${ok} réussi(s) • ${QS.length} questions dans la base</div></div>
+ <div class="grid">${tiles.map(t=>`<div class="tile" onclick="go(${t[3]})"><div class="i">${t[0]}</div><div class="l">${t[1]}</div><div class="s">${t[2]}</div></div>`).join("")}</div>
+ <p class="small" style="text-align:center;margin-top:18px">Application d'entraînement non officielle. Vérifie toujours le code de la route en vigueur.</p>`);
+}
+
+// ---------- cours ----------
+function cours(){
+ render("Cours",`<div class="list">${CH.map((c,i)=>`<div class="card" onclick="openCh(${i})"><span style="font-size:24px">${THEMES[c.id][0]}</span><span class="t">${c.t}</span>${ST.read[c.id]?'<span class="pill ok">lu</span>':""}</div>`).join("")}</div>`);
+}
+function openCh(i){go(()=>chapter(i))}
+function chapter(i){
+ const c=CH[i];ST.read[c.id]=1;save();
+ const n=QS.filter(q=>q[0]==c.id).length;
+ render(c.t,`<div class="card">${c.h}</div><button class="btn" onclick="trainTheme('${c.id}')">✏️ Tester ce chapitre (${n} questions)</button>${i<CH.length-1?`<button class="btn sec" onclick="go(()=>chapter(${i+1}),true)">Chapitre suivant ›</button>`:""}`);
+ speak(c.t);
+}
+
+// ---------- panneaux ----------
+const SCAT=[["A","Danger"],["B","Priorité"],["C","Interdiction"],["D","Obligation"],["E","Arrêt / stationnement"],["F","Indication"]];
+function panneaux(){
+ let h=`<button class="btn" onclick="signQuiz()">🎯 Quiz des panneaux (20)</button>`;
+ for(const [l,n] of SCAT){const ks=Object.keys(SG).filter(k=>k[0]==l);h+=`<h3>${l} – ${n}</h3><div class="sgrid">${ks.map(k=>`<div class="card" onclick="go(()=>signDetail('${k}'))">${signSVG(k,64)}<div><b>${k}</b></div><div>${SG[k][0]}</div></div>`).join("")}</div>`}
+ render("Panneaux",h);
+}
+function signDetail(k){render(k,`<div class="card"><div class="signbig">${signSVG(k,170)}</div><h3>${SG[k][0]}</h3><p>${SG[k][3]}</p></div>`);speak(SG[k][0]+". "+SG[k][3])}
+function signQuiz(){
+ const keys=Object.keys(SG);
+ const list=shuffle(keys).slice(0,20).map(k=>{const same=keys.filter(x=>x!=k&&(SG[x][1]==SG[k][1]||x[0]==k[0]));const pool=shuffle(same.length>=2?same:keys.filter(x=>x!=k)).slice(0,2);
+  return ["sig",0,"Que signifie ce panneau ?",[SG[k][0],SG[pool[0]][0],SG[pool[1]][0]],0,SG[k][3],k]});
+ startQuiz(list,{mode:"train",title:"Quiz panneaux"});
+}
+
+// ---------- thèmes ----------
+function themes(){
+ let h=`<button class="btn" onclick="startQuiz(shuffle(QS).slice(0,20),{mode:'train',title:'20 questions aléatoires'})">🎲 20 questions aléatoires</button>
+ <button class="btn sec" onclick="startQuiz(shuffle(QS.filter(q=>q[1])),{mode:'train',title:'Fautes graves'})">⚠️ Questions « faute grave » (${QS.filter(q=>q[1]).length})</button><div class="list">`;
+ for(const k in THEMES){const n=QS.filter(q=>q[0]==k).length;const s=ST.th[k];const p=s&&s[1]?Math.round(100*s[0]/s[1]):null;
+  h+=`<div class="card" onclick="trainTheme('${k}')"><span style="font-size:24px">${THEMES[k][0]}</span><span class="t">${THEMES[k][1]}<div class="small">${n} questions${p!==null?" • réussite "+p+"%":""}</div></span>›</div>`}
+ render("Entraînement",h+"</div>");
+}
+function trainTheme(k){startQuiz(shuffle(QS.filter(q=>q[0]==k)),{mode:"train",title:THEMES[k][1]})}
+function erreurs(){
+ const ids=Object.keys(ST.wrong).map(Number).filter(i=>QS[i]);
+ if(!ids.length){render("Mes erreurs",`<div class="card">🎉 Aucune erreur à revoir pour l'instant. Fais des tests et les questions ratées apparaîtront ici.</div>`);return}
+ render("Mes erreurs",`<button class="btn" onclick="startQuiz(shuffle(Object.keys(ST.wrong).map(Number).filter(i=>QS[i]).map(i=>QS[i])),{mode:'train',title:'Mes erreurs'})">🔁 Revoir mes ${ids.length} erreur(s)</button>
+ <button class="btn sec" onclick="ST.wrong={};save();go(erreurs,true)">Effacer la liste</button>
+ ${ids.map(i=>{const q=QS[i];return `<div class="card corr bad">${q[6]?signSVG(q[6],44)+" ":""}<b>${esc(q[2])}</b>${q[1]?' <span class="grave">GRAVE</span>':""}<div class="small" style="margin-top:6px">✅ ${esc(q[3][q[4]])}</div><div class="small">${esc(q[5])}</div></div>`}).join("")}`);
+}
+
+// ---------- quiz / examen ----------
+let Q=null;
+function startQuiz(list,opt){
+ if(!list.length)return;
+ Q=Object.assign({i:0,ans:[],sel:null,done:false},opt);
+ Q.list=list.map(q=>({q,ord:shuffle(q[3].map((_,j)=>j))}));
+ go(quizView);
+}
+function quizView(){
+ if(!Q)return goHome();
+ if(Q.i>=Q.list.length)return go(results,true);
+ const it=Q.list[Q.i],q=it.q,n=Q.list.length;
+ const answered=Q.mode=="train"&&Q.ans[Q.i]!==undefined;
+ let h=`<div class="sw small"><span>Question ${Q.i+1}/${n}</span>${Q.timer?`<span class="timer" id="tm"></span>`:""}</div><div class="bar" style="margin:6px 0 10px"><i style="width:${100*Q.i/n}%"></i></div>`;
+ if(q[6])h+=`<div class="signbig">${signSVG(q[6],140)}</div>`;
+ h+=`<div class="qtxt">${esc(q[2])} ${q[1]&&Q.mode=="train"?'<span class="grave">GRAVE</span>':""}</div>`;
+ it.ord.forEach((j,pos)=>{let cls="";
+  if(answered){if(j==q[4])cls="ok";else if(j==Q.ans[Q.i])cls="ko"}else if(Q.sel===j)cls="sel";
+  h+=`<button class="ans ${cls}" onclick="pick(${j})"><span class="k">${"ABC"[pos]}</span><span>${esc(q[3][j])}</span></button>`});
+ if(Q.mode=="train"){
+  if(answered){const good=Q.ans[Q.i]==q[4];h+=`<div class="expl"><b>${good?"✅ Bonne réponse":"❌ Mauvaise réponse"}</b><br>${esc(q[5])}</div><button class="btn" onclick="nextQ()">${Q.i+1<n?"Suivant ›":"Voir le résultat"}</button>`}
+  else h+=`<button class="btn sec" onclick="Q.i=Q.list.length;go(results,true)">Terminer maintenant</button>`;
+ }else h+=`<button class="btn" id="val" onclick="validate()" ${Q.sel===null?"disabled":""}>Valider ›</button><p class="small">Mode examen : pas de retour en arrière, la correction arrive à la fin.</p>`;
+ render(Q.title,h);
+ if(!answered)speak(q[2]+". "+it.ord.map((j,p)=>"ABC"[p]+". "+q[3][j]).join(". "));
+ if(Q.timer&&!answered){let left=Q.timer;const tm=$("#tm");const tick=()=>{if(tm){tm.textContent="⏱ "+left+" s";tm.className="timer"+(left<=5?" low":"")}};tick();
+  const iv=setInterval(()=>{left--;tick();if(left<=0){clearInterval(iv);cleanup=null;validate(true)}},1000);cleanup=()=>clearInterval(iv)}
+}
+function pick(j){
+ if(Q.mode=="train"){if(Q.ans[Q.i]!==undefined)return;Q.ans[Q.i]=j;record(Q.list[Q.i].q,j);quizView()}
+ else{Q.sel=j;document.querySelectorAll(".ans").forEach(b=>b.classList.remove("sel"));const pos=Q.list[Q.i].ord.indexOf(j);document.querySelectorAll(".ans")[pos].classList.add("sel");$("#val").disabled=false}
+}
+function nextQ(){Q.i++;quizView()}
+function validate(){clean();Q.ans[Q.i]=Q.sel===null?-1:Q.sel;Q.sel=null;Q.i++;quizView()}
+function record(q,j){
+ if(q.id===undefined)return;
+ const s=ST.th[q[0]]||[0,0];s[1]++;if(j==q[4])s[0]++;ST.th[q[0]]=s;
+ if(j==q[4]){if(ST.wrong[q.id]){ST.wrong[q.id]--;if(ST.wrong[q.id]<=0)delete ST.wrong[q.id]}}else ST.wrong[q.id]=(ST.wrong[q.id]||0)+1;
+ save();
+}
+function results(){
+ if(!Q)return goHome();
+ if(Q.mode=="exam"&&!Q.done)Q.list.forEach((it,i)=>record(it.q,Q.ans[i]));
+ let good=0,pen=0,graves=0,answered=0;
+ Q.list.forEach((it,i)=>{const a=Q.ans[i];if(a===undefined)return;answered++;if(a==it.q[4])good++;else{if(it.q[1]){pen+=5;graves++}else pen+=1}});
+ let h="";
+ if(Q.mode=="exam"){
+  const score=Math.max(0,50-pen),pass=score>=41;
+  if(!Q.done){ST.hist.push({exam:1,d:Date.now(),score,pass,graves});save()}
+  h+=`<div class="card" style="text-align:center"><div class="big" style="color:${pass?"var(--ok)":"var(--ko)"}">${score}/50</div><span class="pill ${pass?"ok":"ko"}">${pass?"RÉUSSI ✅":"ÉCHOUÉ ❌"}</span><p>${good} bonnes réponses • ${50-good} erreur(s) dont <b>${graves} faute(s) grave(s)</b></p><p class="small">Réussite à partir de 41/50. Faute grave = −5 points.</p></div>`;
+ }else{
+  const p=answered?Math.round(100*good/answered):0;
+  h+=`<div class="card" style="text-align:center"><div class="big">${good}/${answered}</div><span class="pill ${p>=82?"ok":"ko"}">${p}% de réussite</span><p class="small">Objectif : au moins 82 % (équivalent 41/50).</p></div>`;
+ }
+ Q.done=true;
+ h+=`<button class="btn" onclick="goHome()">🏠 Accueil</button><h3>Correction détaillée</h3>`;
+ Q.list.forEach((it,i)=>{const q=it.q,a=Q.ans[i];if(a===undefined)return;const ok=a==q[4];
+  h+=`<div class="card corr ${ok?"":"bad"}"><div class="small">Question ${i+1} ${q[1]?'<span class="grave">GRAVE</span>':""}</div>${q[6]?signSVG(q[6],54):""}<div><b>${esc(q[2])}</b></div>
+  ${ok?`<div style="color:var(--ok)">✅ ${esc(q[3][q[4]])}</div>`:`<div style="color:var(--ko)">❌ Ta réponse : ${a<0?"(aucune – temps écoulé)":esc(q[3][a])}</div><div style="color:var(--ok)">✅ Bonne réponse : ${esc(q[3][q[4]])}</div>`}
+  <div class="small" style="margin-top:4px">💡 ${esc(q[5])}</div></div>`});
+ render("Résultat",h);
+}
+function examMenu(){
+ const ex=ST.hist.filter(h=>h.exam).slice(-5).reverse();
+ render("Examen blanc",`<div class="card"><b>Comme le vrai examen</b><ul><li>50 questions tirées au hasard parmi ${QS.length}</li><li>Réussite : 41/50</li><li>Faute grave : −5 points</li><li>Pas de retour en arrière, correction complète à la fin</li></ul></div>
+ <button class="btn" onclick="startExam(15)">⏱ Examen chronométré (15 s / question)</button>
+ <button class="btn sec" onclick="startExam(0)">📝 Examen sans chrono</button>
+ ${ex.length?`<h3>Derniers examens</h3>`+ex.map(e=>`<div class="card sw"><span>${new Date(e.d).toLocaleDateString("fr-BE")} • ${e.graves} grave(s)</span><span class="pill ${e.pass?"ok":"ko"}">${e.score}/50</span></div>`).join(""):""}`);
+}
+function startExam(t){
+ // tirage équilibré : au moins 2 questions par thème puis complément aléatoire
+ let pick=[];for(const k in THEMES)pick=pick.concat(shuffle(QS.filter(q=>q[0]==k)).slice(0,2));
+ const rest=shuffle(QS.filter(q=>!pick.includes(q)));pick=pick.concat(rest).slice(0,50);
+ startQuiz(shuffle(pick),{mode:"exam",title:"Examen blanc",timer:t});
+}
+
+// ---------- stats / infos ----------
+function stats(){
+ const ex=ST.hist.filter(h=>h.exam);const avg=ex.length?Math.round(ex.reduce((a,b)=>a+b.score,0)/ex.length):0;
+ const hp=ST.hp.slice(-10);const hpavg=hp.length?Math.round(hp.reduce((a,b)=>a+b,0)/hp.length):0;
+ let h=`<div class="grid"><div class="tile"><div class="l">Examens</div><div class="big">${ex.length}</div></div><div class="tile"><div class="l">Moyenne</div><div class="big">${avg}</div></div><div class="tile"><div class="l">Réussis</div><div class="big">${ex.filter(e=>e.pass).length}</div></div><div class="tile"><div class="l">Perception</div><div class="big">${hpavg}%</div></div></div><h3>Réussite par thème</h3>`;
+ for(const k in THEMES){const s=ST.th[k];const p=s&&s[1]?Math.round(100*s[0]/s[1]):0;h+=`<div class="card"><div class="sw"><span>${THEMES[k][0]} ${THEMES[k][1]}</span><b>${s?p+"%":"—"}</b></div><div class="bar" style="margin-top:6px"><i style="width:${p}%;background:${p>=82?"var(--ok)":p>=60?"var(--warn)":"var(--ko)"}"></i></div></div>`}
+ h+=`<button class="btn ko" onclick="resetAll()">Réinitialiser toute la progression</button>`;
+ render("Statistiques",h);
+}
+let resetArm=0;
+function resetAll(){if(Date.now()-resetArm>4000){resetArm=Date.now();alertBox("Appuie encore une fois pour confirmer la réinitialisation.");return}ST={hist:[],wrong:{},th:{},hp:[],read:{},tts:ST.tts};save();goHome()}
+function alertBox(t){const d=document.createElement("div");d.textContent=t;d.style.cssText="position:fixed;left:16px;right:16px;bottom:20px;background:#1b2333;color:#fff;padding:14px;border-radius:12px;z-index:9;text-align:center";document.body.appendChild(d);setTimeout(()=>d.remove(),3000)}
+function infos(){render("L'examen",CH.find(c=>c.id=="perm").h.replace(/\{\{(\w+)\}\}/g,(m,c)=>signSVG(c,40))+`<h3>Conseils</h3><ul><li>Lis chaque question jusqu'au bout : les mots « toujours », « jamais », « sauf » changent tout.</li><li>Les questions graves portent surtout sur : priorités, feux rouges, STOP, piétons, alcool, dépassements dangereux, vitesse.</li><li>Fais au moins 10 examens blancs à 45/50 et plus avant le vrai examen.</li><li>Entraîne la perception des risques : regarde loin, anticipe les dangers cachés.</li></ul>`)}
+
+// =====================================================
+// ---------- PERCEPTION DES RISQUES (vue conducteur) ----------
+// =====================================================
+function hpMenu(){
+ const best=ST.hp.length?Math.max(...ST.hp):0;
+ render("Perception des risques",`<div class="card"><b>Comment ça marche ?</b><p>Tu regardes des situations de conduite en <b>vue conducteur</b>, tirées au hasard. Dès que tu vois un <b>danger qui se développe</b> et qui pourrait t'obliger à freiner ou à changer de direction, appuie sur <b>DANGER</b> (ou touche l'écran).</p><ul><li>Plus tu réagis tôt, plus tu marques de points (5 → 1).</li><li>Trop tôt (avant le danger) = 0 point pour ce clic.</li><li>Cliquer sans arrêt = 0 point pour la situation.</li></ul></div>
+ <button class="btn" onclick="hpSeries()">🎬 Test complet : 5 situations aléatoires</button>
+ <button class="btn sec" onclick="hpSingle()">▶️ Une situation au hasard</button>
+ <p class="small">${HPS.length} scénarios différents, positions et moments aléatoires à chaque fois. Meilleur score : ${best}%</p>`);
+}
+function hpSeries(){const ids=shuffle(HPS.map((_,i)=>i)).slice(0,5);go(()=>hpPlay({ids,k:0,pts:[],review:false}),false)}
+function hpSingle(){go(()=>hpPlay({ids:[Math.floor(Math.random()*HPS.length)],k:0,pts:[],review:false}))}
+
+function rng(seed){return function(){seed|=0;seed=seed+0x6D2B79F5|0;let t=Math.imul(seed^seed>>>15,1|seed);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+
+// --- scénarios ---
+function parkedRow(S,x,z0,z1,r,skip){const cols=["#c0392b","#2c3e50","#7f8c8d","#ecf0f1","#2980b9","#16a085","#8e44ad","#d35400","#111"];for(let z=z0;z<z1;z+=5.6+r()*2.5){if(skip&&skip(z))continue;S.objs.push({k:"car",x:x,z:z,w:1.8,h:1.45,c:cols[Math.floor(r()*cols.length)]})}}
+function decoVille(S,r){for(let z=6;z<260;z+=11+r()*6){S.objs.push({k:"house",x:-10-r()*2,z,w:9,h:6+r()*5,c:["#c8a27a","#b5651d","#d9c3a5","#9e9e9e","#e0d6c8"][Math.floor(r()*5)],rec:1});S.objs.push({k:"house",x:10.5+r()*2,z:z+5,w:9,h:6+r()*5,c:["#c8a27a","#b5651d","#d9c3a5","#9e9e9e","#e0d6c8"][Math.floor(r()*5)],rec:1})}}
+function decoCampagne(S,r,dense){const st=dense?5:13;for(let z=6;z<260;z+=st+r()*st){S.objs.push({k:"tree",x:-6-r()*(dense?6:10),z,w:3,h:5+r()*4,rec:1});S.objs.push({k:"tree",x:6+r()*(dense?6:10),z:z+st/2,w:3,h:5+r()*4,rec:1})}}
+const HPS=[
+{t:"Ballon entre les voitures",ex:"Le ballon qui sort d'entre deux voitures annonce un enfant qui va courir derrière. Il fallait réagir dès l'apparition du ballon et freiner.",env:"ville",
+ build(S,r){decoVille(S,r);const zb=70+r()*25;parkedRow(S,3.9,8,200,r,z=>Math.abs(z-zb)<3.5);
+  S.objs.push({k:"ball",x:3.9,z:zb,w:.3,h:.3,c:"#e33",trig:{z:36,fn(o){o.vx=-3.2;S.hazard()}}});
+  S.objs.push({k:"ped",x:4.3,z:zb+.6,w:.42,h:1.15,c:"#f39c12",trig:{z:35.5,fn(o){S.at(.8,()=>{o.vx=-2.4})}}})}},
+{t:"Portière qui s'ouvre",ex:"Le conducteur de la voiture garée ouvre sa portière dans ta trajectoire. Les indices : une personne visible au volant, des feux allumés. Il fallait ralentir et s'écarter.",env:"ville",
+ build(S,r){decoVille(S,r);const zc=70+r()*30;parkedRow(S,3.9,8,200,r,z=>Math.abs(z-zc)<4);
+  const car={k:"car",x:3.9,z:zc,w:1.8,h:1.45,c:"#34495e",driver:1};S.objs.push(car);
+  S.objs.push({k:"door",x:2.9,z:zc+.05,w:0,h:1.05,c:"#34495e",trig:{z:33,fn(o){S.hazard();o.open=1}}})}},
+{t:"Voiture qui quitte son stationnement",ex:"Le clignotant gauche de la voiture garée et ses roues braquées annonçaient qu'elle allait déboîter devant toi.",env:"ville",
+ build(S,r){decoVille(S,r);const zc=75+r()*30;parkedRow(S,3.9,8,200,r,z=>Math.abs(z-zc)<4);
+  S.objs.push({k:"car",x:3.9,z:zc,w:1.8,h:1.45,c:"#ecf0f1",lights:1,trig:{z:40,fn(o){o.blinkL=1;S.hazard();S.at(1,()=>{o.vx=-1.4;o.vz=2.5;S.at(1.6,()=>{o.vx=0;o.vz=6})})}}})}},
+{t:"Piéton au passage pour piétons",ex:"Le piéton qui attend au bord du passage va traverser : tu dois lui céder le passage. Il fallait ralentir dès qu'il s'approchait.",env:"ville",
+ build(S,r){decoVille(S,r);const zz=70+r()*25;parkedRow(S,3.9,8,zz-15,r);parkedRow(S,3.9,zz+8,200,r);S.objs.push({k:"psign",x:5.6,z:zz-1.5,w:.7,h:2.6,sym:"ped"});
+  S.objs.push({k:"zebra",x:0,z:zz,w:8,h:0});
+  S.objs.push({k:"ped",x:5.8,z:zz+1.5,w:.5,h:1.75,c:"#2e86de",trig:{z:38,fn(o){S.hazard();o.vx=-1.5}}})}},
+{t:"Cycliste qui contourne un obstacle",ex:"Le cycliste devant toi doit contourner une voiture garée : il va se déporter vers le milieu de la route. Il fallait ralentir et attendre avant de le dépasser.",env:"ville",
+ build(S,r){decoVille(S,r);const z0=50+r()*20,tt=(z0-18)/8.9,zo=z0+5*tt+5;S.objs.push({k:"car",x:3.9,z:zo,w:1.8,h:1.45,c:"#2c3e50"});
+  S.objs.push({k:"bike",x:2.5,z:z0,w:.6,h:1.7,c:"#27ae60",vz:5,trig:{z:18,fn(o){S.hazard();o.vx=-1.1;S.at(1.3,()=>{o.vx=0})}}})}},
+{t:"Le véhicule devant freine brusquement",ex:"Les feux stop de la voiture devant s'allument : danger immédiat de collision. Il fallait réagir dès les feux stop.",env:"campagne",v:25,
+ build(S,r){decoCampagne(S,r);const car={k:"car",x:1.75,z:38,w:1.8,h:1.45,c:"#8e44ad",vz:25};S.objs.push(car);
+  S.at(2.5+r()*3,()=>{car.brake=1;car.az=-7;S.hazard()})}},
+{t:"Dépassement dangereux en face",ex:"La voiture en face déboîte pour dépasser et arrive dans ta bande. Il fallait réagir dès qu'elle commençait à se déporter.",env:"campagne",v:25,
+ build(S,r){decoCampagne(S,r);const zA=270+r()*12;
+  S.objs.push({k:"car",x:-1.75,z:zA,w:1.9,h:2.2,c:"#7f8c8d",vz:-18,face:1});
+  S.objs.push({k:"car",x:-1.75,z:zA+16,w:1.8,h:1.45,c:"#e67e22",vz:-24,face:1,trig:{z:145,fn(o){S.hazard();o.vx=3.2;S.at(.8,()=>{o.vx=0;S.at(.6,()=>{o.vx=-3.2;S.at(.8,()=>{o.vx=0})})})}}})}},
+{t:"Animal sur une route boisée",ex:"Dans un bois, un chevreuil surgit du bord de la route. Le panneau et la forêt devaient te rendre attentif ; il fallait réagir dès qu'il sortait des arbres.",env:"campagne",v:19.4,
+ build(S,r){decoCampagne(S,r,1);const zd=90+r()*30,side=r()<.5?-1:1;
+  S.objs.push({k:"deer",x:side*6.5,z:zd,w:1.4,h:1.3,c:"#8d5524",trig:{z:48,fn(o){S.hazard();o.vx=-side*4.2}}})}},
+{t:"Piéton qui sort devant le bus",ex:"Un bus à l'arrêt cache les piétons : quelqu'un peut traverser juste devant lui. Il fallait réagir dès que le piéton apparaissait (et rouler doucement le long du bus).",env:"ville",
+ build(S,r){decoVille(S,r);const zb=75+r()*25;parkedRow(S,3.9,8,zb-14,r);
+  S.objs.push({k:"bus",x:3.9,z:zb,w:2.55,h:3.1,c:"#f1c40f"});
+  S.objs.push({k:"ped",x:3.8,z:zb+2.5,w:.5,h:1.75,c:"#c0392b",trig:{z:33,fn(o){S.hazard();o.vx=-1.6}}})}},
+{t:"Priorité de droite",ex:"Une voiture arrive de la rue de droite et tu n'as pas de panneau de priorité : elle a la priorité de droite. Il fallait ralentir dès qu'elle apparaissait.",env:"ville",
+ build(S,r){decoVille(S,r);const zx=80+r()*25;parkedRow(S,3.9,8,zx-10,r);parkedRow(S,3.9,zx+14,200,r);
+  S.objs=S.objs.filter(o=>!(o.k=="house"&&o.z>zx-28&&o.z<zx+16));S.objs.push({k:"psign",x:5.6,z:zx-1.5,w:.7,h:2.6,sym:"x"});
+  S.objs.push({k:"xroad",x:0,z:zx,w:60,h:0,len:8});
+  S.objs.push({k:"car",x:24,z:zx+5.6,w:4.3,h:1.45,c:"#c0392b",side:1,vxs:0,trig:{z:52,fn(o){S.hazard();o.vx=-8}}})}},
+{t:"Enfant qui court vers l'école",ex:"Près d'une école, un enfant court sur le trottoir puis traverse sans regarder. Il fallait anticiper dès qu'il se dirigeait vers la chaussée.",env:"ville",
+ build(S,r){decoVille(S,r);const zk=70+r()*25;parkedRow(S,3.9,8,zk-5,r);parkedRow(S,3.9,zk+5,200,r);
+  S.objs.push({k:"ped",x:-4.6,z:zk+25,w:.42,h:1.15,c:"#e84393",vz:-2.5,trig:{z:34,fn(o){S.hazard();o.vz=0;o.vx=2.8}}})}}
+];
+
+// --- moteur 3D ---
+function hpPlay(run){
+ const sc=HPS[run.ids[run.k]];
+ const seed=run.seed||(run.seed=Math.floor(Math.random()*1e9));
+ render("Perception des risques",`<div class="sw small"><span>Situation ${run.k+1}/${run.ids.length} ${run.review?"• REVOIR":""}</span><span id="hpi">${run.review?"":"Observe…"}</span></div>
+ <canvas id="cv"></canvas><button class="btn" id="dz">⚠️ DANGER</button><div id="hpres"></div>`);
+ const cv=$("#cv"),ctx=cv.getContext("2d");
+ const W=cv.clientWidth,H=Math.round(W*.62),dpr=window.devicePixelRatio||1;
+ cv.width=W*dpr;cv.height=H*dpr;cv.style.height=H+"px";ctx.scale(dpr,dpr);
+ const r=rng(seed);
+ const S={t:0,d:0,v:sc.v||13.9,objs:[],timers:[],onset:null,taps:[],brakeT:null,end:null,stopped:false};
+ S.at=(dt,fn)=>S.timers.push({t:S.t+dt,fn});
+ S.hazard=()=>{if(S.onset===null){S.onset=S.t;S.brakeT=S.t+1;S.end=S.t+5}};
+ sc.build(S,r);
+ const ville=sc.env=="ville";
+ const camX=ville?1.4:1.75,camH=1.25,F=W*1.15,hy=H*.40,cx=W/2;
+ const RL=ville?-2.8:-3.5,RR=ville?5.0:3.5;
+ const tap=()=>{if(run.review||S.stopped)return;S.taps.push(S.t);flash=0.25;const i=$("#hpi");if(i)i.textContent="🚩 "+S.taps.length};
+ let flash=0;
+ $("#dz").onclick=tap;cv.onclick=tap;
+ if(run.review)$("#dz").style.display="none";
+ const P=(x,z)=>{const s=F/z;return[cx+(x-camX)*s,hy+camH*s,s]};
+ function quad(x1,x2,z1,z2,col){const a=P(x1,z1),b=P(x2,z1),c=P(x2,z2),d=P(x1,z2);ctx.fillStyle=col;ctx.beginPath();ctx.moveTo(a[0],a[1]);ctx.lineTo(b[0],b[1]);ctx.lineTo(c[0],c[1]);ctx.lineTo(d[0],d[1]);ctx.fill()}
+ function box(x,z,w,h,col,lift){const p=P(x,z),s=p[2];const X=p[0]-w*s/2,Y=p[1]-(h+(lift||0))*s;ctx.fillStyle=col;ctx.fillRect(X,Y,w*s,h*s);return[X,Y,w*s,h*s,s]}
+ function drawObj(o){
+  const z=o.z;if(z<2.2||z>300)return;
+  if(o.k=="car"){
+   const [X,Y,w,h,s]=box(o.x,z,o.w,o.h,o.c,.15);
+   ctx.fillStyle="#111";if(o.side){ctx.beginPath();ctx.arc(X+w*.2,Y+h,h*.22,0,7);ctx.arc(X+w*.8,Y+h,h*.22,0,7);ctx.fill();ctx.fillStyle="#9fc5e8";ctx.fillRect(X+w*.25,Y+h*.08,w*.5,h*.35);return}
+   ctx.fillRect(X+w*.05,Y+h*.95,w*.2,h*.18);ctx.fillRect(X+w*.75,Y+h*.95,w*.2,h*.18);
+   ctx.fillStyle=o.face?"#cde":"#26323f";ctx.fillRect(X+w*.12,Y+h*.08,w*.76,h*.36);
+   if(o.driver){ctx.fillStyle="#f0c8a0";ctx.beginPath();ctx.arc(X+w*.3,Y+h*.27,h*.1,0,7);ctx.fill()}
+   const bl=Math.floor(S.t*3)%2==0;
+   if(o.face){ctx.fillStyle="#fffbe0";ctx.fillRect(X+w*.06,Y+h*.55,w*.18,h*.13);ctx.fillRect(X+w*.76,Y+h*.55,w*.18,h*.13)}
+   else{ctx.fillStyle=o.brake?"#ff2020":"#8b1a1a";ctx.fillRect(X+w*.05,Y+h*.55,w*.18,h*.14);ctx.fillRect(X+w*.77,Y+h*.55,w*.18,h*.14);
+    if(o.brake){ctx.fillStyle="rgba(255,40,40,.35)";ctx.fillRect(X-w*.05,Y+h*.45,w*1.1,h*.34);ctx.fillStyle="#ff2020";ctx.fillRect(X+w*.42,Y+h*.02,w*.16,h*.05)}}
+   if(o.blinkL&&bl){ctx.fillStyle="#ffa500";ctx.fillRect(X,Y+h*.5,w*.12,h*.2)}
+   ctx.fillStyle="#eee";ctx.fillRect(X+w*.38,Y+h*.72,w*.24,h*.1);
+  }else if(o.k=="bus"){
+   const [X,Y,w,h]=box(o.x,z,o.w,o.h,o.c,.25);ctx.fillStyle="#26323f";ctx.fillRect(X+w*.08,Y+h*.08,w*.84,h*.35);ctx.fillStyle="#8b1a1a";ctx.fillRect(X+w*.05,Y+h*.8,w*.12,h*.08);ctx.fillRect(X+w*.83,Y+h*.8,w*.12,h*.08);
+   if(o.blinkR&&Math.floor(S.t*3)%2==0){ctx.fillStyle="#ffa500";ctx.fillRect(X+w*.88,Y+h*.65,w*.1,h*.1)}
+   ctx.fillStyle="#111";ctx.font="bold "+Math.max(8,h*.12)+"px Arial";ctx.textAlign="center";ctx.fillText("BUS",X+w/2,Y+h*.62);
+  }else if(o.k=="ped"){
+   const p=P(o.x,z),s=p[2],h=o.h*s,w=o.w*s;const leg=Math.sin(S.t*9)*(o.vx||o.vz?w*.3:0);
+   ctx.fillStyle="#333";ctx.fillRect(p[0]-w*.4+leg,p[1]-h*.45,w*.3,h*.45);ctx.fillRect(p[0]+w*.1-leg,p[1]-h*.45,w*.3,h*.45);
+   ctx.fillStyle=o.c;ctx.fillRect(p[0]-w/2,p[1]-h*.85,w,h*.42);
+   ctx.fillStyle="#f0c8a0";ctx.beginPath();ctx.arc(p[0],p[1]-h*.92,h*.09,0,7);ctx.fill();
+  }else if(o.k=="bike"){
+   const p=P(o.x,z),s=p[2],h=o.h*s;ctx.fillStyle="#111";ctx.fillRect(p[0]-s*.04,p[1]-h*.4,s*.08,h*.4);
+   ctx.fillStyle=o.c;ctx.fillRect(p[0]-s*.22,p[1]-h*.85,s*.44,h*.45);ctx.fillStyle="#f1c40f";ctx.beginPath();ctx.arc(p[0],p[1]-h*.92,h*.09,0,7);ctx.fill();ctx.fillStyle="#d00";ctx.fillRect(p[0]-s*.05,p[1]-h*.45,s*.1,s*.06);
+  }else if(o.k=="ball"){
+   const p=P(o.x,z),s=p[2];ctx.fillStyle=o.c;ctx.beginPath();ctx.arc(p[0],p[1]-.15*s,.15*s,0,7);ctx.fill();ctx.fillStyle="#fff";ctx.beginPath();ctx.arc(p[0]-.04*s,p[1]-.19*s,.05*s,0,7);ctx.fill();
+  }else if(o.k=="door"){
+   if(!o.open)return;o.w=Math.min(1,(o.w||0)+.04);box(o.x+.1-o.w/2,z,o.w,o.h,o.c,.25);
+  }else if(o.k=="deer"){
+   const [X,Y,w,h]=box(o.x,z,o.w,o.h*.45,o.c,o.h*.45);ctx.fillStyle=o.c;ctx.fillRect(X+w*.1,Y+h,w*.08,h);ctx.fillRect(X+w*.82,Y+h,w*.08,h);const dir=o.vx>=0?1:-1;const hx=dir>0?X+w:X-w*.25;ctx.fillRect(hx,Y-h*.9,w*.25,h*1.1);
+  }else if(o.k=="psign"){
+   const p=P(o.x,z),s=p[2];ctx.fillStyle="#666";ctx.fillRect(p[0]-.04*s,p[1]-o.h*s,.08*s,o.h*s);
+   const cxs=p[0],top=p[1]-o.h*s-.05*s,a=o.w*s;ctx.fillStyle="#d0021b";ctx.beginPath();ctx.moveTo(cxs,top-a*.05);ctx.lineTo(cxs+a*.6,top+a);ctx.lineTo(cxs-a*.6,top+a);ctx.fill();
+   ctx.fillStyle="#fff";ctx.beginPath();ctx.moveTo(cxs,top+a*.22);ctx.lineTo(cxs+a*.4,top+a*.88);ctx.lineTo(cxs-a*.4,top+a*.88);ctx.fill();
+   ctx.strokeStyle="#111";ctx.lineWidth=Math.max(1,a*.08);ctx.beginPath();
+   if(o.sym=="x"){ctx.moveTo(cxs-a*.15,top+a*.5);ctx.lineTo(cxs+a*.15,top+a*.8);ctx.moveTo(cxs+a*.15,top+a*.5);ctx.lineTo(cxs-a*.15,top+a*.8)}else{ctx.arc(cxs,top+a*.5,a*.05,0,7);ctx.moveTo(cxs,top+a*.56);ctx.lineTo(cxs,top+a*.72);ctx.lineTo(cxs-a*.08,top+a*.84);ctx.moveTo(cxs,top+a*.72);ctx.lineTo(cxs+a*.08,top+a*.84)}ctx.stroke();
+  }else if(o.k=="tree"){
+   const p=P(o.x,z),s=p[2];ctx.fillStyle="#5d4037";ctx.fillRect(p[0]-.2*s,p[1]-o.h*.45*s,.4*s,o.h*.45*s);ctx.fillStyle="#2e7d32";ctx.beginPath();ctx.arc(p[0],p[1]-o.h*.7*s,o.w*.6*s,0,7);ctx.fill();
+  }else if(o.k=="house"){
+   const [X,Y,w,h]=box(o.x,z,o.w,o.h,o.c);ctx.fillStyle="#7b3f2a";ctx.beginPath();ctx.moveTo(X-w*.03,Y);ctx.lineTo(X+w/2,Y-h*.3);ctx.lineTo(X+w*1.03,Y);ctx.fill();ctx.fillStyle="#bcd6ec";for(let i=0;i<3;i++)ctx.fillRect(X+w*(.12+i*.3),Y+h*.2,w*.16,h*.2);
+  }
+ }
+ function frame(dt){
+  S.t+=dt;
+  for(const tm of S.timers.slice())if(S.t>=tm.t){S.timers.splice(S.timers.indexOf(tm),1);tm.fn()}
+  if(S.brakeT!==null&&S.t>S.brakeT)S.v=Math.max(0,S.v-7.5*dt);
+  S.d+=S.v*dt;
+  for(const o of S.objs){
+   if(o.az){o.vz=Math.max(0,(o.vz||0)+o.az*dt)}
+   o.z-=(S.v-(o.vz||0))*dt;o.x+=(o.vx||0)*dt;
+   if(o.rec&&o.z<2){o.z+=258}
+   if(o.trig&&!o.fired&&o.z<o.trig.z){o.fired=1;o.trig.fn(o)}
+  }
+  if(S.onset===null&&S.t>18)S.hazard();
+ }
+ function draw(){
+  const g=ctx.createLinearGradient(0,0,0,hy);g.addColorStop(0,"#5d9cec");g.addColorStop(1,"#cfe3f7");ctx.fillStyle=g;ctx.fillRect(0,0,W,hy+1);
+  ctx.fillStyle=ville?"#a7a7a7":"#6aa84f";ctx.fillRect(0,hy,W,H-hy);
+  const zf=300,zn=2.2;
+  if(ville){quad(RL-2.5,RL,zn,zf,"#c9c3b8");quad(RR,RR+2.5,zn,zf,"#c9c3b8")}
+  quad(RL,RR,zn,zf,"#4a4d52");
+  for(const o of S.objs){if(o.k=="xroad"&&o.z+o.len>2.2){quad(-40,40,Math.max(2.2,o.z),o.z+o.len,"#4a4d52");if(ville){quad(-40,RL-2.5,Math.max(2.2,o.z-2.5),o.z,"#4a4d52")}}}
+  const lineW=.13;
+  if(!ville){quad(RL+.2,RL+.2+lineW,zn,zf,"#eee");quad(RR-.2-lineW,RR-.2,zn,zf,"#eee")}else{quad(2.8,2.8+lineW,zn,zf,"#ddd")}
+  const off=S.d%12;
+  for(let z=12-off;z<zf;z+=12){if(z>zn)quad(-lineW/2,lineW/2,z,z+4.5,"#f5f5f5")}
+  for(const o of S.objs){if(o.k=="zebra"&&o.z>1){for(let x=-2.6;x<2.8;x+=1){quad(x,x+.5,Math.max(2.2,o.z),o.z+3,"#f5f5f5")}}}
+  const list=S.objs.filter(o=>o.k!="zebra"&&o.k!="xroad").sort((a,b)=>b.z-a.z);
+  for(const o of list)drawObj(o);
+  // capot
+  ctx.fillStyle="#1d2a3a";ctx.beginPath();ctx.moveTo(0,H);ctx.lineTo(0,H*.93);ctx.quadraticCurveTo(W/2,H*.84,W,H*.93);ctx.lineTo(W,H);ctx.fill();
+  ctx.fillStyle="#fff";ctx.font="bold 14px Arial";ctx.textAlign="left";ctx.fillText(Math.round(S.v*3.6)+" km/h",10,H-10);
+  if(flash>0){ctx.fillStyle="rgba(255,0,0,"+flash+")";ctx.fillRect(0,0,W,H);flash-=.03}
+  if(run.review&&S.onset!==null&&S.t<S.onset+4){ctx.fillStyle="rgba(255,200,0,.9)";ctx.fillRect(0,0,W,26);ctx.fillStyle="#000";ctx.font="bold 14px Arial";ctx.textAlign="center";ctx.fillText("⚠ LE DANGER COMMENCE ICI – réagis maintenant",W/2,18)}
+  // barre de temps
+  const tot=S.end||Math.max(S.t+5,12);ctx.fillStyle="rgba(0,0,0,.4)";ctx.fillRect(0,H-4,W,4);ctx.fillStyle="#fff";ctx.fillRect(0,H-4,W*Math.min(1,S.t/tot),4);
+  if(run.review||S.stopped){for(const tp of (run.taps||[])){ctx.fillStyle="#f00";ctx.fillRect(W*tp/tot-2,H-12,4,12)}if(S.onset!==null){ctx.fillStyle="#fc0";ctx.fillRect(W*S.onset/tot,H-8,W*4/tot,8)}}
+ }
+ let last=performance.now(),raf;
+ const loop=now=>{let dt=Math.min(.05,(now-last)/1000);last=now;frame(dt);draw();
+  if(S.end!==null&&S.t>=S.end){finish();return}raf=requestAnimationFrame(loop)};
+ raf=requestAnimationFrame(loop);
+ cleanup=()=>cancelAnimationFrame(raf);
+ function finish(){
+  S.stopped=true;cleanup=null;
+  if(!run.review){run.taps=S.taps.slice();run.onset=S.onset}
+  draw();
+  const taps=run.taps,on=run.onset;let pts=0,msg="",rt=null;
+  if(taps.length>8){msg="Trop de clics : 0 point (comme à l'examen, les clics en rafale sont annulés)."}
+  else{const t=taps.find(x=>x>=on&&x<=on+4);if(t!==undefined){rt=t-on;pts=Math.max(1,5-Math.floor(rt/.8));msg="Réaction après "+rt.toFixed(1)+" s"}else msg=taps.some(x=>x<on)?"Clic trop tôt, avant que le danger n'apparaisse.":"Danger non signalé à temps."}
+  if(!run.review)run.pts[run.k]=pts;
+  const last=run.k+1>=run.ids.length;
+  $("#dz").style.display="none";
+  $("#hpres").innerHTML=`<div class="card"><div class="sw"><b>${esc(sc.t)}</b><span class="pill ${pts>=3?"ok":"ko"}">${run.pts[run.k]}/5</span></div><p class="small">${msg}</p><div class="expl">💡 ${esc(sc.ex)}</div></div>
+   <button class="btn sec" id="rv">🔁 Revoir avec le moment du danger</button>
+   <button class="btn" id="nx">${last?"Voir le résultat final":"Situation suivante ›"}</button>`;
+  $("#rv").onclick=()=>{clean();run.review=true;hpPlay(run)};
+  $("#nx").onclick=()=>{clean();run.review=false;if(last){go(()=>hpFinal(run),true)}else{run.k++;run.seed=0;hpPlay(run)}};
+  speak(sc.t+". "+sc.ex);
+ }
+}
+function hpFinal(run){
+ const tot=run.pts.reduce((a,b)=>a+(b||0),0),max=run.ids.length*5,p=Math.round(100*tot/max);
+ if(!run.saved){ST.hp.push(p);save();run.saved=1}
+ render("Perception des risques",`<div class="card" style="text-align:center"><div class="big">${tot}/${max}</div><span class="pill ${p>=60?"ok":"ko"}">${p}%</span><p class="small">${p>=80?"Excellent, tu anticipes très bien !":p>=60?"Bien, continue à t'entraîner.":"Regarde plus loin et cherche les indices : ballons, clignotants, piétons au bord, feux stop…"}</p></div>
+ ${run.ids.map((id,i)=>`<div class="card sw"><span>${esc(HPS[id].t)}</span><b>${run.pts[i]||0}/5</b></div>`).join("")}
+ <button class="btn" onclick="goBack();hpSeries()">🎬 Nouveau test aléatoire</button><button class="btn sec" onclick="goHome()">🏠 Accueil</button>`);
+}
+
+go(home);
+</script>
+</body></html>
